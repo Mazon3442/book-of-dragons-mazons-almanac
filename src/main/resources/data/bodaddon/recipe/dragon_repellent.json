@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "bodaddon:eel"
+    },
+    {
+      "item": "bodaddon:dragon_root"
+    },
+    {
+      "item": "minecraft:glass_bottle"
+    }
+  ],
+  "result": {
+    "id": "bodaddon:dragon_repellent",
+    "count": 1
+  }
+}

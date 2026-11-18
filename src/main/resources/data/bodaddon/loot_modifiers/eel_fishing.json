@@ -1,0 +1,16 @@
+{
+  "type": "bodaddon:eel_fishing",
+  "chance": 0.12,
+  "conditions": [
+    {
+      "condition": "neoforge:loot_table_id",
+      "loot_table_id": "minecraft:gameplay/fishing"
+    },
+    {
+      "condition": "minecraft:location_check",
+      "predicate": {
+        "biomes": "#bodaddon:has_eel"
+      }
+    }
+  ]
+}

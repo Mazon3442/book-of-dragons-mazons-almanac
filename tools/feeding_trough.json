@@ -1,0 +1,36 @@
+{
+  "name": "feeding_trough",
+  "width": 16,
+  "height": 16,
+  "transparent": true,
+  "palette": {
+    "A": "#2a1a1f",
+    "B": "#4a2c2a",
+    "C": "#6b4132",
+    "D": "#8f5e3a",
+    "E": "#b98448",
+    "K": "#21242e",
+    "L": "#3d4252",
+    "M": "#5f677a",
+    "N": "#8c94a8",
+    "g": "#C98F34"
+  },
+  "grid": [
+    "................",
+    "................",
+    "...ABBBBBBBBBA..",
+    "..ADEEEEEEEEEDA.",
+    ".ADBAAAAAAAABCA.",
+    "AEBAABBBBAAABCA.",
+    "NMEEEEEEEEEDMCA.",
+    "MgDDDDDDDDDgLBA.",
+    "MLCCCACACCCLLBA.",
+    "MLDDCCAACDDLLBA.",
+    "MLCCCCACCCCLLBA.",
+    "KLBBBBBBBBBLKA..",
+    ".ABBAAAAAABBA...",
+    ".DCB......DCB...",
+    "ADBA......ADBA..",
+    "AAA........AAA.."
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "variants": {
+    "facing=south,mount=ceiling": {
+      "model": "bodaddon:block/stable_sign_ceiling"
+    },
+    "facing=south,mount=floor": {
+      "model": "bodaddon:block/stable_sign_floor"
+    },
+    "facing=south,mount=flat": {
+      "model": "bodaddon:block/stable_sign_flat"
+    },
+    "facing=south,mount=wall": {
+      "model": "bodaddon:block/stable_sign_wall",
+      "y": 90
+    },
+    "facing=west,mount=ceiling": {
+      "model": "bodaddon:block/stable_sign_ceiling",
+      "y": 90
+    },
+    "facing=west,mount=floor": {
+      "model": "bodaddon:block/stable_sign_floor",
+      "y": 90
+    },
+    "facing=west,mount=flat": {
+      "model": "bodaddon:block/stable_sign_flat",
+      "y": 90
+    },
+    "facing=west,mount=wall": {
+      "model": "bodaddon:block/stable_sign_wall",
+      "y": 180
+    },
+    "facing=north,mount=ceiling": {
+      "model": "bodaddon:block/stable_sign_ceiling",
+      "y": 180
+    },
+    "facing=north,mount=floor": {
+      "model": "bodaddon:block/stable_sign_floor",
+      "y": 180
+    },
+    "facing=north,mount=flat": {
+      "model": "bodaddon:block/stable_sign_flat",
+      "y": 180
+    },
+    "facing=north,mount=wall": {
+      "model": "bodaddon:block/stable_sign_wall",
+      "y": 270
+    },
+    "facing=east,mount=ceiling": {
+      "model": "bodaddon:block/stable_sign_ceiling",
+      "y": 270
+    },
+    "facing=east,mount=floor": {
+      "model": "bodaddon:block/stable_sign_floor",
+      "y": 270
+    },
+    "facing=east,mount=flat": {
+      "model": "bodaddon:block/stable_sign_flat",
+      "y": 270
+    },
+    "facing=east,mount=wall": {
+      "model": "bodaddon:block/stable_sign_wall"
+    }
+  }
+}

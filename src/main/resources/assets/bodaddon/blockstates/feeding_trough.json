@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,part=foot": {
+      "model": "bodaddon:block/feeding_trough_foot"
+    },
+    "facing=north,part=head": {
+      "model": "bodaddon:block/feeding_trough_head"
+    },
+    "facing=east,part=foot": {
+      "model": "bodaddon:block/feeding_trough_foot",
+      "y": 90
+    },
+    "facing=east,part=head": {
+      "model": "bodaddon:block/feeding_trough_head",
+      "y": 90
+    },
+    "facing=south,part=foot": {
+      "model": "bodaddon:block/feeding_trough_foot",
+      "y": 180
+    },
+    "facing=south,part=head": {
+      "model": "bodaddon:block/feeding_trough_head",
+      "y": 180
+    },
+    "facing=west,part=foot": {
+      "model": "bodaddon:block/feeding_trough_foot",
+      "y": 270
+    },
+    "facing=west,part=head": {
+      "model": "bodaddon:block/feeding_trough_head",
+      "y": 270
+    }
+  }
+}

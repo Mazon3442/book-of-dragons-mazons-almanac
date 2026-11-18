@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "S S",
+    "SSS",
+    "L L"
+  ],
+  "key": {
+    "S": {
+      "tag": "minecraft:wooden_slabs"
+    },
+    "L": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "id": "bodaddon:feeding_trough"
+  }
+}

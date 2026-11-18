@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#bodaddon:has_dragon_root",
+  "features": "bodaddon:dragon_root_patch",
+  "step": "vegetal_decoration"
+}

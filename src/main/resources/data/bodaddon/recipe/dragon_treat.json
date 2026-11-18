@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    [{ "item": "minecraft:cooked_cod" }, { "item": "minecraft:cooked_salmon" }],
+    { "item": "minecraft:wheat" },
+    { "item": "minecraft:honey_bottle" }
+  ],
+  "result": { "id": "bodaddon:dragon_treat", "count": 2 }
+}

@@ -1,0 +1,10 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": "#bodaddon:has_eel",
+  "spawners": {
+    "type": "bodaddon:eel",
+    "weight": 2,
+    "minCount": 1,
+    "maxCount": 1
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#bodaddon:has_sage_tree",
+  "features": "bodaddon:sage_tree",
+  "step": "vegetal_decoration"
+}

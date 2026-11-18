@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "bodaddon:dragon_repellent"
+    },
+    {
+      "item": "bodaddon:dragon_repellent"
+    },
+    {
+      "item": "minecraft:moss_block"
+    },
+    {
+      "item": "minecraft:moss_block"
+    }
+  ],
+  "result": {
+    "id": "bodaddon:dragon_repellent_block",
+    "count": 1
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "name": "sage_sapling",
+  "width": 16,
+  "height": 16,
+  "palette": {
+    "a": "#293d37",
+    "b": "#47654f",
+    "c": "#739363",
+    "d": "#a9c089",
+    "e": "#d7dfad",
+    "k": "#352a27",
+    "l": "#674b34",
+    "m": "#95764b",
+    "n": "#c2a16b"
+  },
+  "grid": [
+    ".........a......",
+    "...aa...adb.....",
+    "...edcbaedb.....",
+    "....bdcbdcb..aa.",
+    "...l.abb.bkbcde.",
+    "aa.l....lmbdcb..",
+    "edcbal..nlbba...",
+    ".bdcb.n.mk......",
+    "..abb..lmk.ll.aa",
+    "..aa....nkl.bcde",
+    "..edcba.ml.bdcb.",
+    "...bdcb.lk.bba..",
+    "....abblk.......",
+    ".......nk.......",
+    ".......ll.......",
+    ".....llmkll....."
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "fruiting=false": {
+      "model": "bodaddon:block/sage_leaves"
+    },
+    "fruiting=true": {
+      "model": "bodaddon:block/sage_leaves_fruit"
+    }
+  }
+}

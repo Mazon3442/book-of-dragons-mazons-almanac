@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#bodaddon:has_dragon_nip",
+  "features": "bodaddon:dragon_nip_patch",
+  "step": "vegetal_decoration"
+}

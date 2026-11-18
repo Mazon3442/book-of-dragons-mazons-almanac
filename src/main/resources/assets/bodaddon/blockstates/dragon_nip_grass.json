@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "half=lower": {
+      "model": "bodaddon:block/dragon_nip_grass_bottom"
+    },
+    "half=upper": {
+      "model": "bodaddon:block/dragon_nip_grass_top"
+    }
+  }
+}

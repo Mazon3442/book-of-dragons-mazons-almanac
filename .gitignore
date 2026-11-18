@@ -1,0 +1,13 @@
+.gradle/
+build/
+run/
+libs/
+*.iml
+.idea/
+
+output/
+.scratch/
+reference/
+mc_out/
+__pycache__/
+*.pyc

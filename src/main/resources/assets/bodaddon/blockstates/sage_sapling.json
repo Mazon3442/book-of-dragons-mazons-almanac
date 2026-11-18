@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "bodaddon:block/sage_sapling"
+    }
+  }
+}
