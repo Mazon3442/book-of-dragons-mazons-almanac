@@ -47,17 +47,30 @@ public final class VariantEdits {
         if (rowIndex < 0 || rowIndex >= rows.size()) return;
         Row row = rows.get(rowIndex);
         if (option < 0 || option >= row.options().size()) return;
+        apply(d, row, row.options().get(option));
+    }
+
+    static boolean set(DragonBase d, String locus, int slot, ResourceLocation choice) {
+        for (Row row : rowsOf(d)) {
+            if (row.locus().name().equals(locus) && row.slot() == slot && row.options().contains(choice)) {
+                return apply(d, row, choice);
+            }
+        }
+        return false;
+    }
+
+    private static boolean apply(DragonBase d, Row row, ResourceLocation choice) {
         GenotypeComponent component = d.componentRegistry.get(GenotypeComponent.class);
-        if (component == null || component.getPaletteDraws() == null) return;
+        if (component == null || component.getPaletteDraws() == null) return false;
 
         PaletteDraws draws = component.getPaletteDraws();
-        ResourceLocation choice = row.options().get(option);
         if (row.locus().getCategory() == Locus.LocusCategory.COLOR) {
             draws.setColorDraw(row.locus(), row.slot(), choice, choice);
         } else {
             draws.setStructureDraw(row.locus(), row.slot(), choice, choice, null);
         }
         d.setGenotypeAndDraws(d.getGenotype(), draws);   // re-applies and re-syncs the look to clients
+        return true;
     }
 
     private static List<Row> rowsOf(DragonBase d) {

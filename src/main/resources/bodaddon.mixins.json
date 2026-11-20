@@ -1,0 +1,13 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "local.bodaddon.spatial.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "WorldScreenRendererMixin",
+    "RenderUtilMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

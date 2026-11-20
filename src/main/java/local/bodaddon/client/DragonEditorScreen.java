@@ -1,13 +1,12 @@
 package local.bodaddon.client;
 
-import java.io.InputStream;
-import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
+
+import static local.bodaddon.client.VariantsPanel.ROWS_PER_PAGE;
+import static local.bodaddon.client.VariantsPanel.drawSwatch;
+import static local.bodaddon.client.VariantsPanel.swatch;
 
 import local.bodaddon.BodAddon;
 import local.bodaddon.editor.EditAction;
@@ -15,7 +14,6 @@ import local.bodaddon.editor.EditorPayloads;
 import local.bodaddon.editor.EditorState;
 import local.bodaddon.editor.Traits;
 import local.bodaddon.editor.VariantRow;
-import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -34,8 +32,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.network.PacketDistributor;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 /**
@@ -73,7 +69,6 @@ public class DragonEditorScreen extends Screen {
     private static final int EMBER_LIGHT = 0xFFFFAE48;
     private static final int IRON_LIGHT = 0xFF5D5C62;
     private static final int IRON_MID = 0xFF47474C;
-    private static final int IRON_DARK = 0xFF35363A;
 
     private enum Tab {
         BOND("bond", "bond"),
@@ -92,8 +87,6 @@ public class DragonEditorScreen extends Screen {
         Component label() { return Component.translatable("bodaddon.editor.tab_short." + key); }
     }
 
-    private static final int ROWS_PER_PAGE = 5;
-
     private static Tab remembered = Tab.BOND;
 
     private EditorState state;
@@ -103,24 +96,13 @@ public class DragonEditorScreen extends Screen {
     /** Trait values as the sliders show them right now, so the radar chart follows a drag before it is sent. */
     private float[] liveTraits;
     private int variantPage;
-    /** Row of the colour/pattern list being edited in the picker, or -1 while the list itself is showing. */
-    private int pickerRow = -1;
-    /** Identity of the picked row (locus and slot), so the picker survives the row list being recomputed. */
-    private String pickerKey;
-    /** The rows worth showing, with their position in the server's list; see {@link LiveSlots}. */
-    private VariantRow[] shown = new VariantRow[0];
-    private int[] shownIndex = new int[0];
-    private String drawsKey = "";
-    private int pickerScroll;
-    private float viewYaw;
-    private float viewZoom = 1.0F;
-    private float viewFocus = 0.5F;
+    private final VariantsPanel variants = new VariantsPanel();
     private boolean draggingView;
 
     public DragonEditorScreen(EditorState state) {
         super(Component.translatable("bodaddon.editor.title"));
         this.state = state;
-        rebuildShown();
+        variants.rebuild(dragonEntity(), state.variants());
     }
 
     public int entityId() { return state.entityId(); }
@@ -128,7 +110,7 @@ public class DragonEditorScreen extends Screen {
     public void refresh(EditorState fresh) {
         this.state = fresh;
         liveTraits = null;
-        rebuildShown();
+        variants.rebuild(dragonEntity(), state.variants());
         rebuildWidgets();
     }
 
@@ -139,7 +121,7 @@ public class DragonEditorScreen extends Screen {
     private int contentX() { return left + RIGHT_X; }
     private int contentY() { return top + CONTENT_Y; }
     private int leftX() { return left + LEFT_X; }
-    private boolean picking() { return tab == Tab.VARIANTS && pickerRow >= 0; }
+    private boolean picking() { return tab == Tab.VARIANTS && variants.pickerRow >= 0; }
     private int viewH() { return picking() ? VIEW_H_TALL : VIEW_H; }
 
     // --- layout -------------------------------------------------------------------------------
@@ -200,25 +182,24 @@ public class DragonEditorScreen extends Screen {
                 }
             }
             case VARIANTS -> {
-                VariantRow[] rows = shown;
-                if (pickerRow >= rows.length) pickerRow = -1;
-                if (pickerRow >= 0) {
-                    final int row = pickerRow;
-                    addRenderableWidget(new OptionList(x, y, COL_W, rows[row], option -> send(EditAction.SET_VARIANT, shownIndex[row], option)));
+                VariantRow[] rows = variants.shown;
+                if (variants.pickerRow >= 0) {
+                    final int row = variants.pickerRow;
+                    addRenderableWidget(variants.new OptionList(font, VariantsPanel.Skin.SLATE, x, y, COL_W, rows[row], option -> send(EditAction.SET_VARIANT, variants.shownIndex[row], option)));
                 } else {
-                    variantPage = Mth.clamp(variantPage, 0, variantPages() - 1);
+                    variantPage = Mth.clamp(variantPage, 0, variants.pages() - 1);
                     for (int i = 0; i < ROWS_PER_PAGE; i++) {
                         final int row = variantPage * ROWS_PER_PAGE + i;
                         if (row >= rows.length) break;
                         addRenderableWidget(new VariantButton(x, y + i * ROW_STEP, COL_W, rows[row], () -> openPicker(row)));
                     }
-                    if (variantPages() > 1) {
+                    if (variants.pages() > 1) {
                         JournalButton prev = addRenderableWidget(new JournalButton(x, y + ROWS_PER_PAGE * ROW_STEP + 2, 28, 16,
                             Component.literal("<"), false, () -> turnPage(-1)));
                         JournalButton next = addRenderableWidget(new JournalButton(x + COL_W - 28, y + ROWS_PER_PAGE * ROW_STEP + 2, 28, 16,
                             Component.literal(">"), false, () -> turnPage(1)));
                         prev.active = variantPage > 0;
-                        next.active = variantPage < variantPages() - 1;
+                        next.active = variantPage < variants.pages() - 1;
                     }
                 }
             }
@@ -235,94 +216,26 @@ public class DragonEditorScreen extends Screen {
         return mc.level == null ? null : mc.level.getEntity(state.entityId());
     }
 
-    /**
-     * Picks which of the server's rows to offer: colour rows whose slot the renderer never reads are hidden (editing
-     * them changes nothing), and what is left of a locus is numbered 1, 2, 3 in order. Pattern rows are all kept.
-     */
-    private void rebuildShown() {
-        Entity dragon = dragonEntity();
-        Set<String> live = LiveSlots.compute(dragon);
-        drawsKey = LiveSlots.key(dragon);
-        VariantRow[] all = state.variants();
-        List<Integer> keep = new ArrayList<>();
-        Map<String, Integer> perLocus = new HashMap<>();
-        for (int i = 0; i < all.length; i++) {
-            VariantRow r = all[i];
-            if (r.color() && live != null && !live.contains(r.locus() + ":" + r.slot())) continue;
-            keep.add(i);
-            perLocus.merge(r.locus(), 1, Integer::sum);
-        }
-        shown = new VariantRow[keep.size()];
-        shownIndex = new int[keep.size()];
-        Map<String, Integer> seen = new HashMap<>();
-        pickerRow = -1;
-        for (int k = 0; k < keep.size(); k++) {
-            VariantRow r = all[keep.get(k)];
-            int number = seen.merge(r.locus(), 1, Integer::sum);
-            String label = perLocus.get(r.locus()) > 1 ? r.label() + " " + number : r.label();
-            shown[k] = new VariantRow(label, r.locus(), r.slot(), r.color(), r.options(), r.ids(), r.current());
-            shownIndex[k] = keep.get(k);
-            if (pickerKey != null && pickerKey.equals(r.locus() + ":" + r.slot())) pickerRow = k;
-        }
-    }
-
-    /** The synced look can arrive a moment after the editor's own packet, so re-check the live slots when it changes. */
     @Override
     public void tick() {
-        if (tab == Tab.VARIANTS && !LiveSlots.key(dragonEntity()).equals(drawsKey)) {
-            rebuildShown();
+        if (tab == Tab.VARIANTS && variants.lookChanged(dragonEntity())) {
+            variants.rebuild(dragonEntity(), state.variants());
             rebuildWidgets();
         }
     }
 
     private void openPicker(int row) {
-        pickerRow = row;
-        pickerKey = shown[row].locus() + ":" + shown[row].slot();
-        pickerScroll = -1;      // the list centres on the current option the first time it is built
-        View v = View.of(shown[row].locus());
-        viewYaw = v.yaw;
-        viewZoom = v.zoom;
-        viewFocus = v.focus;
+        variants.openPicker(row);
         rebuildWidgets();
     }
 
     private void closePicker() {
-        pickerRow = -1;
-        pickerKey = null;
+        variants.closePicker();
         rebuildWidgets();
     }
 
-    /** Where the camera starts for each kind of edit: heads close up, wings wide, and so on. */
-    private enum View {
-        HEAD(20F, 2.4F, 0.78F), WINGS(40F, 1.5F, 0.6F), LEGS(50F, 1.8F, 0.25F), BACK(140F, 1.6F, 0.55F), BODY(60F, 1.4F, 0.5F);
-
-        final float yaw;
-        final float zoom;
-        final float focus;
-
-        View(float yaw, float zoom, float focus) {
-            this.yaw = yaw;
-            this.zoom = zoom;
-            this.focus = focus;
-        }
-
-        static View of(String locus) {
-            return switch (locus) {
-                case "e", "z", "f", "s" -> HEAD;
-                case "w", "x", "k", "a", "i", "v" -> WINGS;
-                case "l" -> LEGS;
-                case "d", "r", "h" -> BACK;
-                default -> BODY;
-            };
-        }
-    }
-
-    private int variantPages() {
-        return Math.max(1, (shown.length + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE);
-    }
-
     private void turnPage(int by) {
-        variantPage = Mth.clamp(variantPage + by, 0, variantPages() - 1);
+        variantPage = Mth.clamp(variantPage + by, 0, variants.pages() - 1);
         rebuildWidgets();
     }
 
@@ -373,8 +286,7 @@ public class DragonEditorScreen extends Screen {
         if (next == tab) return;
         tab = next;
         remembered = next;
-        pickerRow = -1;
-        pickerKey = null;
+        variants.closePicker();
         draggingView = false;
         rebuildWidgets();
         for (var child : children()) {
@@ -408,7 +320,7 @@ public class DragonEditorScreen extends Screen {
         drawHeader(g);
 
         // section title on a plate across the top of the controls
-        Component sectionTitle = picking() ? Component.literal(shown[pickerRow].label()) : tab.title();
+        Component sectionTitle = picking() ? Component.literal(variants.shown[variants.pickerRow].label()) : tab.title();
         String shownTitle = font.plainSubstrByWidth(sectionTitle.getString().toUpperCase(java.util.Locale.ROOT), 138);
         int plateW = 150;
         int plateX = contentX() + (COL_W - plateW) / 2;
@@ -422,7 +334,7 @@ public class DragonEditorScreen extends Screen {
         g.blitSprite(sprite("viewport_frame"), vx, vy, LEFT_W, vh);
         if (picking()) {
             if (dragonEntity() instanceof LivingEntity dragon) {
-                drawZoomedDragon(g, dragon, vx + 5, vy + 5, vx + LEFT_W - 5, vy + vh - 5);
+                variants.drawDragon(g, dragon, vx + 5, vy + 5, vx + LEFT_W - 5, vy + vh - 5);
             } else {
                 drawPreviewUnavailable(g, vx, vy, vh);
             }
@@ -477,42 +389,15 @@ public class DragonEditorScreen extends Screen {
         g.drawString(font, text, x + (LEFT_W - font.width(text)) / 2, y + h / 2, FADED, false);
     }
 
-    /** Same render path as the vanilla inventory paper doll, with a free yaw, zoom and focus height instead of mouse-follow. */
-    private void drawZoomedDragon(GuiGraphics g, LivingEntity dragon, int x1, int y1, int x2, int y2) {
-        float size = Math.max(0.5F, Math.max(dragon.getBbWidth(), dragon.getBbHeight()));
-        float scale = Math.max(3.0F, Math.min(LEFT_W - 10, viewH() - 10) * 0.42F / size) * viewZoom;
-        Vector3f translate = new Vector3f(0.0F, dragon.getBbHeight() * viewFocus, 0.0F);
-        Quaternionf pose = new Quaternionf().rotateZ((float) Math.PI);
-
-        float bodyRot = dragon.yBodyRot;
-        float yRot = dragon.getYRot();
-        float xRot = dragon.getXRot();
-        float headRotO = dragon.yHeadRotO;
-        float headRot = dragon.yHeadRot;
-        dragon.yBodyRot = 180.0F + viewYaw;
-        dragon.setYRot(180.0F + viewYaw);
-        dragon.setXRot(0.0F);
-        dragon.yHeadRot = dragon.getYRot();
-        dragon.yHeadRotO = dragon.getYRot();
-        g.enableScissor(x1, y1, x2, y2);
-        InventoryScreen.renderEntityInInventory(g, (x1 + x2) / 2.0F, (y1 + y2) / 2.0F, scale, translate, pose, new Quaternionf(), dragon);
-        g.disableScissor();
-        dragon.yBodyRot = bodyRot;
-        dragon.setYRot(yRot);
-        dragon.setXRot(xRot);
-        dragon.yHeadRotO = headRotO;
-        dragon.yHeadRot = headRot;
-    }
-
     private boolean overViewport(double mx, double my) {
-        return tab == Tab.VARIANTS && pickerRow >= 0
+        return tab == Tab.VARIANTS && variants.pickerRow >= 0
             && mx >= leftX() && mx < leftX() + LEFT_W && my >= top + BODY_Y && my < top + BODY_Y + viewH();
     }
 
     @Override
     public boolean mouseDragged(double mx, double my, int button, double dx, double dy) {
         if (draggingView && button == 0) {
-            viewYaw += (float) dx * 1.5F;
+            variants.turn(dx);
             return true;
         }
         return super.mouseDragged(mx, my, button, dx, dy);
@@ -527,7 +412,7 @@ public class DragonEditorScreen extends Screen {
     @Override
     public boolean mouseScrolled(double mx, double my, double scrollX, double scrollY) {
         if (overViewport(mx, my)) {
-            viewZoom = Mth.clamp(viewZoom * (1.0F + 0.12F * (float) scrollY), 0.5F, 5.0F);
+            variants.zoom(scrollY);
             return true;
         }
         return super.mouseScrolled(mx, my, scrollX, scrollY);
@@ -651,10 +536,10 @@ public class DragonEditorScreen extends Screen {
                         : Component.translatable("bodaddon.editor.breeding_none"));
             }
             case VARIANTS -> {
-                if (shown.length == 0) {
+                if (variants.shown.length == 0) {
                     wrap(g, Component.translatable("bodaddon.editor.variants.none"), x, y);
-                } else if (pickerRow < 0 && variantPages() > 1) {
-                    Component page = Component.translatable("bodaddon.editor.variants.page", variantPage + 1, variantPages());
+                } else if (variants.pickerRow < 0 && variants.pages() > 1) {
+                    Component page = Component.translatable("bodaddon.editor.variants.page", variantPage + 1, variants.pages());
                     g.drawString(font, page, x + (COL_W - font.width(page)) / 2, y + ROWS_PER_PAGE * ROW_STEP + 6, FADED, false);
                 }
             }
@@ -766,161 +651,6 @@ public class DragonEditorScreen extends Screen {
         @Override public void onPress() { onOpen.run(); }
         @Override public void playDownSound(SoundManager sounds) { playClick(sounds); }
         @Override protected void updateWidgetNarration(NarrationElementOutput out) { defaultButtonNarrationText(out); }
-    }
-
-    /** Scrollable list of every option for one row, with palette swatches for colours; picking sends at once. */
-    private final class OptionList extends AbstractWidget {
-        private static final int ROW_H = 14;
-        private static final int BAR_W = 4;
-        private final VariantRow row;
-        private final java.util.function.IntConsumer onPick;
-        private final int visible;
-        private int current;
-        private int keyboardIndex;
-        private boolean draggingBar;
-
-        OptionList(int x, int y, int width, VariantRow row, java.util.function.IntConsumer onPick) {
-            super(x, y, width, 112, Component.literal(row.label()));
-            this.row = row;
-            this.onPick = onPick;
-            this.current = row.current();
-            this.keyboardIndex = current;
-            this.visible = height / ROW_H;
-            if (pickerScroll < 0) pickerScroll = current - visible / 2;
-            pickerScroll = Mth.clamp(pickerScroll, 0, maxScroll());
-        }
-
-        private int maxScroll() { return Math.max(0, row.options().length - visible); }
-
-        private int listWidth() { return width - (row.options().length > visible ? BAR_W + 2 : 0); }
-
-        @Override
-        protected void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partial) {
-            int n = row.options().length;
-            g.blitSprite(sprite("readout"), getX(), getY(), width, height);
-            g.enableScissor(getX() + 1, getY() + 1, getX() + width - 1, getY() + height - 1);
-            for (int i = 0; i < visible && pickerScroll + i < n; i++) {
-                int index = pickerScroll + i;
-                int ry = getY() + i * ROW_H;
-                boolean selected = index == current;
-                boolean hot = isFocused() && keyboardIndex == index
-                    || mouseX >= getX() && mouseX < getX() + listWidth() && mouseY >= ry && mouseY < ry + ROW_H;
-                if (selected) {
-                    g.fill(getX() + 1, ry, getX() + listWidth(), ry + ROW_H - 1, IRON_MID);
-                    g.fill(getX() + 1, ry, getX() + 3, ry + ROW_H - 1, EMBER);
-                } else if (hot) {
-                    g.fill(getX() + 1, ry, getX() + listWidth(), ry + ROW_H - 1, IRON_DARK);
-                }
-                int textX = getX() + 5;
-                if (row.color()) {
-                    drawSwatch(g, swatch(row.ids()[index]), textX, ry + 3, 3, 7);
-                    textX += 22;
-                }
-                String name = font.plainSubstrByWidth(row.options()[index], getX() + listWidth() - textX - 2);
-                g.drawString(font, name, textX, ry + 3, selected ? INK : FADED, false);
-            }
-            g.disableScissor();
-            if (isFocused()) g.renderOutline(getX() - 1, getY() - 1, width + 2, height + 2, EMBER);
-            if (n > visible) {
-                int bx = getX() + width - BAR_W;
-                g.fill(bx, getY() + 1, bx + BAR_W, getY() + height - 1, 0xFF1C1D20);
-                int thumbH = Math.max(10, height * visible / n);
-                int thumbY = getY() + (height - thumbH) * pickerScroll / maxScroll();
-                g.fill(bx, thumbY, bx + BAR_W, thumbY + thumbH, draggingBar ? EMBER_LIGHT : IRON_LIGHT);
-            }
-        }
-
-        @Override
-        public void onClick(double mx, double my) {
-            if (row.options().length > visible && mx >= getX() + width - BAR_W - 1) {
-                draggingBar = true;
-                dragBar(my);
-                return;
-            }
-            int index = pickerScroll + (int) ((my - getY()) / ROW_H);
-            if (index >= 0 && index < row.options().length && index != current) {
-                current = index;
-                keyboardIndex = index;
-                onPick.accept(index);
-            }
-        }
-
-        private void dragBar(double my) {
-            double t = Mth.clamp((my - getY()) / height, 0.0, 1.0);
-            pickerScroll = (int) Math.round(t * maxScroll());
-        }
-
-        @Override protected void onDrag(double mx, double my, double dx, double dy) { if (draggingBar) dragBar(my); }
-        @Override public void onRelease(double mx, double my) { draggingBar = false; }
-
-        @Override
-        public boolean keyPressed(int key, int scan, int modifiers) {
-            if (!active || !isFocused() || row.options().length == 0) return false;
-            if (key == GLFW.GLFW_KEY_UP || key == GLFW.GLFW_KEY_DOWN
-                || key == GLFW.GLFW_KEY_HOME || key == GLFW.GLFW_KEY_END) {
-                keyboardIndex = key == GLFW.GLFW_KEY_HOME ? 0 : key == GLFW.GLFW_KEY_END ? row.options().length - 1
-                    : Mth.clamp(keyboardIndex + (key == GLFW.GLFW_KEY_UP ? -1 : 1), 0, row.options().length - 1);
-                pickerScroll = Mth.clamp(pickerScroll, Math.max(0, keyboardIndex - visible + 1), keyboardIndex);
-                pickerScroll = Mth.clamp(pickerScroll, 0, maxScroll());
-                setMessage(Component.literal(row.label() + ": " + row.options()[keyboardIndex]));
-                return true;
-            }
-            if (key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER || key == GLFW.GLFW_KEY_SPACE) {
-                if (keyboardIndex != current) {
-                    current = keyboardIndex;
-                    onPick.accept(current);
-                }
-                return true;
-            }
-            return super.keyPressed(key, scan, modifiers);
-        }
-
-        @Override
-        public boolean mouseScrolled(double mx, double my, double scrollX, double scrollY) {
-            if (!isMouseOver(mx, my) || scrollY == 0) return false;
-            pickerScroll = Mth.clamp(pickerScroll - (int) Math.signum(scrollY) * 2, 0, maxScroll());
-            return true;
-        }
-
-        @Override public void playDownSound(SoundManager sounds) { }
-        @Override protected void updateWidgetNarration(NarrationElementOutput out) { defaultButtonNarrationText(out); }
-    }
-
-    // --- palette swatches ---------------------------------------------------------------------
-
-    private static final Map<String, int[]> SWATCHES = new HashMap<>();
-    private static final int[] NO_SWATCH = new int[0];
-
-    /**
-     * The shade ramp of a palette, read from its tiny strip texture (the id is already a texture path, otherwise assets/NS/textures/entity/genetics/ID_PATH.png),
-     * so the list shows the real colours. Patterns and anything that cannot be read just get no swatch.
-     */
-    private static int[] swatch(String id) {
-        return SWATCHES.computeIfAbsent(id, key -> {
-            ResourceLocation rl = ResourceLocation.tryParse(key);
-            if (rl == null) return NO_SWATCH;
-            ResourceLocation tex = rl.getPath().endsWith(".png") ? rl
-                : ResourceLocation.fromNamespaceAndPath(rl.getNamespace(), "textures/entity/genetics/" + rl.getPath() + ".png");
-            try (InputStream in = Minecraft.getInstance().getResourceManager().getResource(tex).orElseThrow().open();
-                 NativeImage img = NativeImage.read(in)) {
-                int n = Math.min(img.getWidth(), 6);
-                int[] out = new int[n];
-                for (int i = 0; i < n; i++) {
-                    int x = n == 1 ? 0 : i * (img.getWidth() - 1) / (n - 1);
-                    int abgr = img.getPixelRGBA(x, 0);
-                    out[i] = 0xFF000000 | ((abgr & 0xFF) << 16) | (abgr & 0xFF00) | ((abgr >> 16) & 0xFF);
-                }
-                return out;
-            } catch (Exception ex) {
-                return NO_SWATCH;
-            }
-        });
-    }
-
-    private static void drawSwatch(GuiGraphics g, int[] colors, int x, int y, int cell, int height) {
-        if (colors.length == 0) return;
-        g.fill(x - 1, y - 1, x + colors.length * cell + 1, y + height + 1, 0xFF101113);
-        for (int i = 0; i < colors.length; i++) g.fill(x + i * cell, y, x + (i + 1) * cell, y + height, colors[i]);
     }
 
     /** One row on a plate: the label, an iron groove with an ember fill and a riveted handle, then the value. Sends when released. */

@@ -36,6 +36,7 @@ public class BodAddon {
             .icon(() -> new ItemStack(ModItems.DRAGON_EDITOR.get()))
             .displayItems((params, out) -> {
                 out.accept(ModItems.DRAGON_EDITOR.get());
+                out.accept(ModItems.HICCUPS_SKETCHBOOK.get());
                 out.accept(ModBlocks.FEEDING_TROUGH_ITEM.get());
                 out.accept(ModItems.DRAGON_TREAT.get());
                 out.accept(ModItems.DRAGON_NIP.get());

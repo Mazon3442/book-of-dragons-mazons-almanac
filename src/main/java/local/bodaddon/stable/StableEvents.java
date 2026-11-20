@@ -41,7 +41,7 @@ public final class StableEvents {
         if (hold) {
             // A held dragon still sleeps when it needs to: with the pin at full the stay outbids all but extreme tiredness, so
             // ease it while the sleep need is high (and keep it eased until the dragon has slept and is rested again).
-            float debt = mind.reservoirs().sleepDebt();
+            float debt = mind.reservoirs().fatigue();
             boolean resting = data.getBoolean(RESTING_KEY) ? debt > REST_DONE || dragon.asleep() : debt >= REST_NEEDED;
             data.putBoolean(RESTING_KEY, resting);
             mind.forceComply(resting ? RESTING_COMPLIANCE : 1.0F);

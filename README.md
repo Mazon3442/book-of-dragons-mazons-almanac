@@ -34,6 +34,7 @@ Mazon's Almanac is an addon for [Book of Dragons](https://www.curseforge.com/min
 | <img src="docs/images/items/dragon_repellent.png" width="48"> | **Dragon Repellent** | Drink it for 8 minutes of Dragon Scent and wild dragons keep their distance. Also a placeable block. |
 | <img src="docs/images/items/eel.png" width="48"> | **Eel** | A new catch when you fish in rivers and swamps. |
 | <img src="docs/images/items/dragon_editor.png" width="48"> | **Dragon Editor** | Creative only. Opens the editor below. |
+| | **Hiccup's Sketchbook** | Edit the colors and markings of a dragon you've tamed. |
 
 Dragon Root is a block that drives off wild dragons within 6 blocks when you place it.
 
@@ -51,6 +52,7 @@ Dragon Root is a block that drives off wild dragons within 6 blocks when you pla
 | Dragon Repellent | Eel, Dragon Root, glass bottle (shapeless) |
 | Dragon Repellent Block | Two Dragon Repellent and two moss blocks (shapeless) |
 | Dragon Editor | Creative inventory only |
+| Hiccup's Sketchbook | Creative inventory or `/give @s bodaddon:hiccups_sketchbook`. Survival recipe pending. |
 
 ### Finding and gathering
 
@@ -72,6 +74,12 @@ Dragon Root is a block that drives off wild dragons within 6 blocks when you pla
 
 </details>
 
+## Hiccup's Sketchbook
+
+Right-click your own tamed dragon with the sketchbook. Opening it consumes one book in survival. You can make as many color and marking changes as you like during that session, with every palette for the species available. Click a row to open the scrollable palette and zoom the live dragon toward the area you're editing. Drag the dragon to turn it, or scroll over it to zoom.
+
+Use the page corners, Left and Right, or scroll over the right-hand page to turn pages. Set `pageFlip` in `bodaddon-client.toml` to `MESH` (default), `SIMPLE`, or `OFF`.
+
 ## Dragon Editor
 
 Right-click any dragon with the Dragon Editor to open a work board with a live 3D preview. It has five tabs: **Bond** (loyalty from Wild to Devoted, or instant taming), **Vitals**, **Mind**, **Social** (make every dragon within 32 blocks get along), and **Variants**.
@@ -92,6 +100,10 @@ Right-click any dragon with the Dragon Editor to open a work board with a live 3
   <sub>Colors and markings</sub>
 </p>
 
+## Spatial GUI support
+
+If you also have [Spatial GUI](https://www.curseforge.com/minecraft/mc-mods/spatial-gui) 1.x installed, the Almanac fixes its mouse picking while you ride a flying dragon. Spatial GUI normally builds its picking ray from camera yaw and pitch, which doesn't match the dragon flight camera, so menu clicks land in the wrong place. The Almanac uses the exact matrices Spatial GUI rendered the menu with instead. It only applies in flight with a Spatial GUI menu open, and it does nothing if Spatial GUI isn't installed. It's client-side only.
+
 ## Requirements
 
 | Requirement | Version |
@@ -99,8 +111,9 @@ Right-click any dragon with the Dragon Editor to open a work board with a live 3
 | Minecraft | 1.21.1 |
 | Loader | NeoForge 21.1 or newer |
 | Java | 21 |
-| Book of Dragons | 1.4.1 or newer |
-| Fauna Engine | 1.1 or newer (below 2.0) |
+| Book of Dragons | 1.4.2 or newer |
+| Fauna Engine | 1.3 or newer (below 2.0) |
+| Spatial GUI (optional) | 1.x |
 
 <details>
 <summary>Config options</summary>
@@ -112,7 +125,7 @@ You can change how far feeding troughs and stable plates reach. Every species al
 <details>
 <summary>Building from source</summary>
 
-The build compiles against the Book of Dragons and Fauna Engine jars, which aren't included here. Put `bookofdragons-1.4.1-1.21.1.jar` and `faunaengine-1.2-1.21.1-neoforge.jar` in a `libs/` folder in the project root, then run:
+The build compiles against the Book of Dragons and Fauna Engine jars, which aren't included here. Put `bookofdragons-1.4.2-1.21.1.jar` and `faunaengine-1.3-1.21.1-neoforge.jar` in a `libs/` folder in the project root. Add `spatial-gui-1.11.0-1.21.1-neoforge.jar` there too, since the Spatial GUI fix compiles against it. Then run:
 
 ```bash
 ./gradlew build

@@ -1,6 +1,7 @@
 package local.bodaddon;
 
 import local.bodaddon.editor.DragonEditorItem;
+import local.bodaddon.editor.SketchbookItem;
 import local.bodaddon.item.DragonPoulticeItem;
 import local.bodaddon.item.DragonTreatItem;
 import local.bodaddon.item.DragonNipItem;
@@ -24,6 +25,9 @@ public final class ModItems {
 
     public static final DeferredHolder<Item, DragonEditorItem> DRAGON_EDITOR = ITEMS.register("dragon_editor",
         () -> new DragonEditorItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
+
+    public static final DeferredHolder<Item, SketchbookItem> HICCUPS_SKETCHBOOK = ITEMS.register("hiccups_sketchbook",
+        () -> new SketchbookItem(new Item.Properties().stacksTo(1)));
 
     public static final DeferredHolder<Item, DragonTreatItem> DRAGON_TREAT = ITEMS.register("dragon_treat",
         () -> new DragonTreatItem(new Item.Properties()));

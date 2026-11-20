@@ -7,7 +7,10 @@ modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 authors="${mod_authors}"
-description='''An addon for Book of Dragons.'''
+description='''An addon for Book of Dragons. Also fixes Spatial GUI mouse picking while flying a dragon, when Spatial GUI is installed.'''
+
+[[mixins]]
+config="bodaddon.mixins.json"
 
 [[dependencies.${mod_id}]]
 modId="neoforge"
@@ -26,13 +29,20 @@ side="BOTH"
 [[dependencies.${mod_id}]]
 modId="bookofdragons"
 type="required"
-versionRange="[1.4.1-1.21.1,)"
+versionRange="[1.4.2-1.21.1,)"
 ordering="AFTER"
 side="BOTH"
 
 [[dependencies.${mod_id}]]
 modId="faunaengine"
 type="required"
-versionRange="[1.1,2)"
+versionRange="[1.3,2)"
 ordering="AFTER"
 side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="spatial_gui"
+type="optional"
+versionRange="[1.0,2)"
+ordering="NONE"
+side="CLIENT"
