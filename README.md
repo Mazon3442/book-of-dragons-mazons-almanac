@@ -59,7 +59,7 @@ Dragon Root is a plant that grows in four stages. Once it is fully grown it driv
 | Dragon Repellent | Eel, Dragon Root, glass bottle (shapeless) |
 | Dragon Repellent Block | Two Dragon Repellent and two moss blocks (shapeless) |
 | Dragon Editor | Creative inventory only |
-| Sketchbook | Book, Ink Sac, Feather (shapeless) |
+| Sketchbook | Book, Ink Sac, Feather, and any dragon scale (shapeless) |
 | Cooked Eel | Cook an Eel in a furnace, smoker, or campfire |
 
 ### Finding and gathering

@@ -6,7 +6,7 @@ All notable changes to Book of Dragons: Mazon's Almanac. Newest first.
 
 ### New
 - **Sketchbook:** a reusable item that opens a book on one of your own tamed dragons and edits its colors and markings.
-  - Crafting: Book + Ink Sac + Feather, shapeless.
+  - Crafting: Book + Ink Sac + Feather + any dragon scale, shapeless.
   - The dragon sits in a page-turning book with a real page-curl animation. Page corners, the arrow keys and scrolling all turn pages.
   - Italic pixel font, larger centered titles, and paint dabs tinted from the dragon's own palette.
   - A flat icon in the inventory and a 3D leather book in your hand, on the ground and in item frames.

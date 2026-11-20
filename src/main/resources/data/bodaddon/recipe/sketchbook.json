@@ -2,9 +2,21 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    { "item": "minecraft:book" },
-    { "item": "minecraft:ink_sac" },
-    { "item": "minecraft:feather" }
+    {
+      "item": "minecraft:book"
+    },
+    {
+      "item": "minecraft:ink_sac"
+    },
+    {
+      "item": "minecraft:feather"
+    },
+    {
+      "tag": "bookofdragons:dragon_scales"
+    }
   ],
-  "result": { "id": "bodaddon:sketchbook", "count": 1 }
+  "result": {
+    "id": "bodaddon:sketchbook",
+    "count": 1
+  }
 }

@@ -110,6 +110,19 @@ public final class SketchbookGameTests {
     }
 
     @GameTest(template = "empty")
+    public static void sketchbookRecipeNeedsAnyDragonScale(GameTestHelper helper) {
+        var holder = helper.getLevel().getRecipeManager().byKey(ResourceLocation.fromNamespaceAndPath("bodaddon", "sketchbook")).orElseThrow();
+        var ingredients = holder.value().getIngredients();
+        helper.assertTrue(ingredients.size() == 4, "The sketchbook is a book, an ink sac, a feather and a scale");
+        for (String scale : List.of("nightfury_scales", "gronckle_scales", "hobgobbler_scales")) {
+            var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("bookofdragons", scale));
+            helper.assertTrue(ingredients.stream().anyMatch(i -> i.test(new ItemStack(item))), "Any dragon scale must work: " + scale);
+        }
+        helper.assertTrue(ingredients.stream().noneMatch(i -> i.test(new ItemStack(net.minecraft.world.item.Items.STICK))), "A stick is not a scale");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
     public static void sketchbookRequiresABookAndAnOwnedDragonInReach(GameTestHelper helper) {
         DragonBase dragon = dragon(helper);
         ServerPlayer owner = player(helper, dragon);
