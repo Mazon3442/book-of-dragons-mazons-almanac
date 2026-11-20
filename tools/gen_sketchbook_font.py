@@ -1,7 +1,9 @@
-"""Build the sketchbook bitmap font from Kalam (SIL OFL, tools/fonts/Kalam-OFL.txt).
+"""Build the sketchbook bitmap fonts from Patrick Hand (SIL OFL, tools/fonts/PatrickHand-OFL.txt).
 
-Draws every glyph big, area-averages down to the pixel grid and snaps to three tones (ink, half ink, none) so the
-text sits on the same pixel grid as the book art. Writes the glyph atlas and font definition, and a preview.
+Two fonts come out: `sketchbook` (body text) and `sketchbook_title` (the page headings, a bit larger). Each glyph is
+drawn big, slanted into an italic, area-averaged down to the pixel grid and snapped to solid ink or nothing, so the
+text sits on the same pixel grid as the book art with no half-transparent pixels. Writes the glyph atlases, the font
+definitions and a preview.
 
     python tools/gen_sketchbook_font.py
 """
@@ -10,105 +12,111 @@ import pathlib
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-TTF = ROOT / "tools/fonts/Kalam-Regular.ttf"
+TTF = ROOT / "tools/fonts/PatrickHand-Regular.ttf"
 OUT = ROOT / "src/main/resources/assets/bodaddon"
-EM = 11            # pixel size of the font
-SS = 8             # supersampling
-FULL, HALF = 140, 50   # coverage (of 255) needed for full ink / half ink
-HALF_ALPHA = 120
-SPACING = 0.0      # extra pixels added to every advance (Minecraft adds 1 itself)
+SS = 8              # supersampling
+FULL = 100          # coverage (of 255) needed for a pixel to be ink in the body font; headings use less, so they are bolder
+SHEAR = 0.22        # italic slant (horizontal shift per unit of height)
 COLS = 16
 CHARS = [chr(c) for c in range(33, 127)]
 
-font = ImageFont.truetype(str(TTF), EM * SS)
+
+def build(name, em, full):
+    font = ImageFont.truetype(str(TTF), em * SS)
+
+    def render(ch):
+        w, h = em * 3 * SS, em * 3 * SS
+        base = em * 2 * SS
+        big = Image.new("L", (w, h), 0)
+        ImageDraw.Draw(big).text((em * SS, base), ch, font=font, fill=255, anchor="ls")
+        big = big.transform(big.size, Image.AFFINE, (1, SHEAR, -SHEAR * base, 0, 1, 0), Image.BICUBIC)
+        small = big.resize((em * 3, em * 3), Image.BOX)
+        return small.point(lambda v: 255 if v >= full else 0), em * 2
+
+    glyphs, nat = {}, {}
+    top = bottom = 0
+    for ch in CHARS:
+        img, base = render(ch)
+        box = img.getbbox()
+        if not box:
+            continue
+        glyphs[ch] = (img, base, box)
+        nat[ch] = font.getlength(ch) / SS
+        top = max(top, base - box[1])
+        bottom = max(bottom, box[3] - base)
+
+    def left(ch):
+        return max(0, glyphs[ch][2][0] - em)
+
+    def ink(ch):
+        return glyphs[ch][2][2] - glyphs[ch][2][0]
+
+    def width(ch):
+        return max(left(ch) + ink(ch), round(nat[ch]) - 1)
+
+    cell_w = max(width(c) for c in glyphs) + 1
+    cell_h = top + bottom
+    rows = (len(CHARS) + COLS - 1) // COLS
+    atlas = Image.new("RGBA", (COLS * cell_w, rows * cell_h), (255, 255, 255, 0))
+    layout = [[] for _ in range(rows)]
+    adv = {}
+    for i, ch in enumerate(CHARS):
+        r, c = divmod(i, COLS)
+        layout[r].append(ch)
+        if ch not in glyphs:
+            continue
+        img, base, box = glyphs[ch]
+        cell = Image.new("RGBA", (cell_w, cell_h), (255, 255, 255, 0))
+        glyph = img.crop((box[0], base - top, box[2], base + bottom))
+        white = Image.new("RGBA", glyph.size, (255, 255, 255, 255))
+        white.putalpha(glyph)
+        cell.paste(white, (left(ch), 0))
+        w = width(ch)
+        if w > left(ch) + glyph.width:   # an invisible pixel widens the advance without drawing anything
+            cell.putpixel((w - 1, 0), (255, 255, 255, 1))
+        atlas.paste(cell, (c * cell_w, r * cell_h))
+        adv[ch] = w + 1
+
+    (OUT / "textures/font").mkdir(parents=True, exist_ok=True)
+    atlas.save(OUT / f"textures/font/{name}.png")
+    definition = {"providers": [
+        {"type": "space", "advances": {" ": max(3, em // 3)}},
+        {"type": "bitmap", "file": f"bodaddon:font/{name}.png", "ascent": top, "height": cell_h,
+         "chars": ["".join(row).ljust(COLS, "\u0000") for row in layout]},
+        {"type": "reference", "id": "minecraft:default"},
+    ]}
+    (OUT / "font").mkdir(parents=True, exist_ok=True)
+    (OUT / f"font/{name}.json").write_text(json.dumps(definition, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(name, "cell", cell_w, "x", cell_h, "ascent", top)
+    return atlas, glyphs, adv, cell_w, cell_h
 
 
-def render(ch):
-    """Return (alpha image at native size, ink bbox) with the baseline on a fixed row."""
-    w, h = EM * 2 * SS, EM * 3 * SS
-    big = Image.new("L", (w, h), 0)
-    base = EM * 2 * SS
-    ImageDraw.Draw(big).text((EM * SS, base), ch, font=font, fill=255, anchor="ls")
-    small = big.resize((w // SS, h // SS), Image.BOX)
-    return small.point(lambda v: 255 if v >= FULL else (HALF_ALPHA if v >= HALF else 0)), EM * 2
-
-
-glyphs = {}
-NAT = {}
-top = bottom = 0
-for ch in CHARS:
-    img, base = render(ch)
-    box = img.getbbox()
-    if not box:
-        continue
-    glyphs[ch] = (img, base, box)
-    NAT[ch] = font.getlength(ch) / SS
-    top = max(top, base - box[1])
-    bottom = max(bottom, box[3] - base)
-
-ORIGIN = EM   # x of the font origin inside the rendered image
-def left(ch):
-    return max(0, glyphs[ch][2][0] - ORIGIN)   # natural left bearing, never negative
-def inkw(ch):
-    return glyphs[ch][2][2] - glyphs[ch][2][0]
-def width(ch):   # glyph width as Minecraft will measure it: bearing + ink, widened to the font's advance
-    return max(left(ch) + inkw(ch), round(NAT[ch] + SPACING) - 1)
-CELL_W = max(width(c) for c in glyphs) + 1
-ASCENT = top
-CELL_H = top + bottom
-rows = (len(CHARS) + COLS - 1) // COLS
-atlas = Image.new("RGBA", (COLS * CELL_W, rows * CELL_H), (255, 255, 255, 0))
-layout = [[] for _ in range(rows)]
-adv = {}
-for i, ch in enumerate(CHARS):
-    r, c = divmod(i, COLS)
-    layout[r].append(ch)
-    if ch not in glyphs:
-        continue
-    img, base, box = glyphs[ch]
-    cell = Image.new("RGBA", (CELL_W, CELL_H), (255, 255, 255, 0))
-    glyph = img.crop((box[0], base - top, box[2], base + bottom))   # left edge trimmed, baseline fixed
-    white = Image.new("RGBA", glyph.size, (255, 255, 255, 255))
-    white.putalpha(glyph)
-    cell.paste(white, (left(ch), 0))
-    w = width(ch)
-    if w > left(ch) + glyph.width:   # an invisible pixel widens the advance without drawing anything
-        cell.putpixel((w - 1, 0), (255, 255, 255, 1))
-    atlas.paste(cell, (c * CELL_W, r * CELL_H))
-    adv[ch] = w + 1
-
-font_dir = OUT / "font"
-tex_dir = OUT / "textures/font"
-tex_dir.mkdir(parents=True, exist_ok=True)
-atlas.save(tex_dir / "sketchbook.png")
-definition = {"providers": [
-    {"type": "space", "advances": {" ": 4}},
-    {"type": "bitmap", "file": "bodaddon:font/sketchbook.png", "ascent": ASCENT, "height": CELL_H,
-     "chars": ["".join(row).ljust(COLS, "\u0000") for row in layout]},
-    {"type": "reference", "id": "minecraft:default"},
-]}
-(font_dir / "sketchbook.json").write_text(json.dumps(definition, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-print("cell", CELL_W, "x", CELL_H, "ascent", ASCENT, "atlas", atlas.size)
-
-
-def preview(lines, scale=4):
+def preview(sets, lines, scale=4):
     PAPER, INK = (0xEE, 0xC8, 0x9E), (0x4A, 0x2E, 0x1C)
-    line_h = CELL_H + 1
-    width = max(sum(adv.get(c, 4) for c in l) for l in lines) + 6
-    img = Image.new("RGB", (width, line_h * len(lines) + 4), PAPER)
-    for n, text in enumerate(lines):
+    parts = []
+    for (atlas, glyphs, adv, cw, ch_), text in zip(sets, lines):
+        w = sum(adv.get(c, 4) for c in text) + 6
+        img = Image.new("RGB", (w, ch_ + 4), PAPER)
         x = 3
-        for ch in text:
-            if ch in glyphs:
-                i = CHARS.index(ch)
-                r, c = divmod(i, COLS)
-                cell = atlas.crop((c * CELL_W, r * CELL_H, (c + 1) * CELL_W, (r + 1) * CELL_H))
-                ink = Image.new("RGB", cell.size, INK)
-                img.paste(ink, (x, 2 + n * line_h), cell.getchannel("A"))
-            x += adv.get(ch, 4)
-    return img.resize((img.width * scale, img.height * scale), Image.NEAREST)
+        for c in text:
+            if c in glyphs:
+                r, col = divmod(CHARS.index(c), COLS)
+                cell = atlas.crop((col * cw, r * ch_, (col + 1) * cw, (r + 1) * ch_))
+                img.paste(Image.new("RGB", cell.size, INK), (x, 2), cell.getchannel("A"))
+            x += adv.get(c, 4)
+        parts.append(img)
+    sheet = Image.new("RGB", (max(p.width for p in parts), sum(p.height for p in parts)), PAPER)
+    y = 0
+    for p in parts:
+        sheet.paste(p, (0, y))
+        y += p.height
+    return sheet.resize((sheet.width * scale, sheet.height * scale), Image.NEAREST)
 
 
-preview(["Colors and markings", "Base Color  Tempest", "Underbelly Color", "Gradient Color 2  1 / 6",
-         "Night Fury  Sketchbook", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz 0123456789"]
-        ).save(ROOT / ".scratch/sketchbook_font_preview.png")
+if __name__ == "__main__":
+    body = build("sketchbook", 12, FULL)
+    title = build("sketchbook_title", 16, 60)
+    preview([title, title, body, body, body],
+            ["Sketchbook", "Markings", "Face/Limb Color  Noct  Deep steel", "Wing Gradient Color  3 / 6",
+             "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789"]
+            ).save(ROOT / ".scratch/sketchbook_font_preview.png")

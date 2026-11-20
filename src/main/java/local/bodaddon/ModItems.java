@@ -26,7 +26,7 @@ public final class ModItems {
     public static final DeferredHolder<Item, DragonEditorItem> DRAGON_EDITOR = ITEMS.register("dragon_editor",
         () -> new DragonEditorItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
 
-    public static final DeferredHolder<Item, SketchbookItem> HICCUPS_SKETCHBOOK = ITEMS.register("hiccups_sketchbook",
+    public static final DeferredHolder<Item, SketchbookItem> SKETCHBOOK = ITEMS.register("sketchbook",
         () -> new SketchbookItem(new Item.Properties().stacksTo(1)));
 
     public static final DeferredHolder<Item, DragonTreatItem> DRAGON_TREAT = ITEMS.register("dragon_treat",
@@ -46,6 +46,10 @@ public final class ModItems {
 
     public static final DeferredHolder<Item, Item> EEL = ITEMS.register("eel",
         () -> new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(2).saturationModifier(0.1F).build())));
+
+    // Same food values as cooked cod.
+    public static final DeferredHolder<Item, Item> COOKED_EEL = ITEMS.register("cooked_eel",
+        () -> new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(5).saturationModifier(0.6F).build())));
 
     public static final DeferredHolder<Item, MobBucketItem> EEL_BUCKET = ITEMS.register("eel_bucket",
         () -> new MobBucketItem(ModEntities.EEL.get(), Fluids.WATER, SoundEvents.BUCKET_EMPTY_FISH, new Item.Properties().stacksTo(1)));

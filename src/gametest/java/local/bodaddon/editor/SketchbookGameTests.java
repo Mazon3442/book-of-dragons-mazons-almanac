@@ -34,6 +34,7 @@ public final class SketchbookGameTests {
         ServerPlayer owner = player(helper, dragon);
         ServerPlayer stranger = player(helper, dragon);
         dragon.adopt(owner.getUUID());
+        dragon.setBond(owner.getUUID(), 1000);   // a fully bonded dragon offers every look, so the random next option is never locked
         dragon.setHealth(dragon.getMaxHealth() / 2);
         holdBook(owner);
         List<Packet<?>> sent = new ArrayList<>();
@@ -72,13 +73,50 @@ public final class SketchbookGameTests {
     }
 
     @GameTest(template = "empty")
+    public static void rareLooksAreLockedUntilTheDragonIsBondedEnough(GameTestHelper helper) {
+        DragonBase dragon = dragon(helper);
+        ServerPlayer owner = player(helper, dragon);
+        dragon.adopt(owner.getUUID());
+        DragonEdits.setBond(dragon, owner.getUUID(), 0);
+        helper.assertTrue(dragon.getBond(owner.getUUID()) == 0, "The test needs an unbonded dragon");
+        holdBook(owner);
+        List<Packet<?>> sent = new ArrayList<>();
+        capturePackets(owner, sent);
+        helper.assertTrue(owner.interactOn(dragon, InteractionHand.OFF_HAND).consumesAction(), "The sketchbook should open");
+        var open = sent.stream().filter(ClientboundCustomPayloadPacket.class::isInstance).map(ClientboundCustomPayloadPacket.class::cast)
+            .map(ClientboundCustomPayloadPacket::payload).filter(EditorPayloads.SketchbookPage.class::isInstance)
+            .map(EditorPayloads.SketchbookPage.class::cast).findFirst().orElseThrow();
+        VariantRow locked = null;
+        int lockedOption = -1;
+        for (VariantRow row : open.rows()) {
+            for (int i = 0; i < row.bondNeeded().length && locked == null; i++) {
+                if (row.bondNeeded()[i] > 0) {
+                    locked = row;
+                    lockedOption = i;
+                }
+            }
+        }
+        helper.assertTrue(locked != null, "An unbonded dragon must have some locked looks");
+        helper.assertTrue(locked.bondNeeded()[locked.current()] == 0, "The look the dragon already wears is never locked");
+        var choice = new EditorPayloads.SketchbookChoice(open.token(), locked.locus(), locked.slot(), ResourceLocation.parse(locked.ids()[lockedOption]));
+        helper.assertTrue(SketchbookSessions.change(owner, choice) == null, "A locked look must be refused by the server");
+        dragon.setBond(owner.getUUID(), 1000);
+        var after = SketchbookSessions.change(owner, choice);
+        helper.assertTrue(after != null, "A fully bonded dragon must accept every look");
+        for (VariantRow row : after.rows()) {
+            for (int need : row.bondNeeded()) helper.assertTrue(need == 0, "Nothing stays locked at full bond");
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
     public static void sketchbookRequiresABookAndAnOwnedDragonInReach(GameTestHelper helper) {
         DragonBase dragon = dragon(helper);
         ServerPlayer owner = player(helper, dragon);
         ServerPlayer stranger = player(helper, dragon);
         holdBook(owner);
         helper.assertTrue(SketchbookSessions.open(owner, dragon, InteractionHand.OFF_HAND) == null, "A wild dragon should be rejected");
-        helper.assertTrue(owner.getOffhandItem().is(ModItems.HICCUPS_SKETCHBOOK.get()), "A rejected attempt should keep the book");
+        helper.assertTrue(owner.getOffhandItem().is(ModItems.SKETCHBOOK.get()), "A rejected attempt should keep the book");
         dragon.adopt(owner.getUUID());
         holdBook(stranger);
         helper.assertTrue(SketchbookSessions.open(stranger, dragon, InteractionHand.OFF_HAND) == null, "A non-owner should be rejected");
@@ -124,7 +162,7 @@ public final class SketchbookGameTests {
     }
 
     private static void holdBook(ServerPlayer player) {
-        player.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(ModItems.HICCUPS_SKETCHBOOK.get()));
+        player.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(ModItems.SKETCHBOOK.get()));
     }
 
     private static void capturePackets(ServerPlayer player, List<Packet<?>> sent) {

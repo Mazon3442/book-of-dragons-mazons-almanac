@@ -12,8 +12,26 @@
       ],
       "entries": [
         {
-          "type": "minecraft:item",
-          "name": "bodaddon:dragon_root"
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "name": "bodaddon:dragon_root",
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "bodaddon:dragon_root",
+                  "properties": {
+                    "age": "3"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "bodaddon:dragon_root_seeds"
+            }
+          ]
         }
       ]
     }

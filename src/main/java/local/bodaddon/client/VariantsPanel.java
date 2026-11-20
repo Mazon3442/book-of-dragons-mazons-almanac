@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.function.IntConsumer;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.RenderSystem;
 import local.bodaddon.BodAddon;
 import local.bodaddon.editor.VariantRow;
 import net.minecraft.client.Minecraft;
@@ -34,6 +35,7 @@ final class VariantsPanel {
     static final int ROWS_PER_PAGE = 5;
     private static final ResourceLocation READOUT = ResourceLocation.fromNamespaceAndPath(BodAddon.MOD_ID, "readout");
     private static final ResourceLocation LETTERING = ResourceLocation.fromNamespaceAndPath(BodAddon.MOD_ID, "sketchbook");
+    private static final ResourceLocation TITLE_LETTERING = ResourceLocation.fromNamespaceAndPath(BodAddon.MOD_ID, "sketchbook_title");
     VariantRow[] shown = new VariantRow[0];
     int[] shownIndex = new int[0];
     int pickerRow = -1;
@@ -63,6 +65,11 @@ final class VariantsPanel {
 
         Component text(Component label) {
             return this == PAPER ? label.copy().withStyle(style -> style.withFont(LETTERING)) : label;
+        }
+
+        /** Page headings: the larger, bolder cut of the same lettering. */
+        Component title(Component label) {
+            return this == PAPER ? label.copy().withStyle(style -> style.withFont(TITLE_LETTERING)) : label;
         }
 
         FormattedCharSequence fit(Font font, Component label, int width) {
@@ -99,7 +106,7 @@ final class VariantsPanel {
             VariantRow r = all[keep.get(k)];
             int number = seen.merge(r.locus(), 1, Integer::sum);
             String label = perLocus.get(r.locus()) > 1 ? r.label() + " " + number : r.label();
-            shown[k] = new VariantRow(label, r.locus(), r.slot(), r.color(), r.options(), r.ids(), r.current());
+            shown[k] = new VariantRow(label, r.locus(), r.slot(), r.color(), r.options(), r.ids(), r.current(), r.bondNeeded());
             shownIndex[k] = keep.get(k);
             if (pickerKey != null && pickerKey.equals(r.locus() + ":" + r.slot())) pickerRow = k;
         }
@@ -234,8 +241,19 @@ final class VariantsPanel {
                     drawSwatch(g, swatch(row.ids()[index]), textX, ry + 3, 3, 7);
                     textX += 22;
                 }
-                FormattedCharSequence name = skin.fit(font, Component.literal(row.options()[index]), getX() + listWidth() - textX - 2);
-                g.drawString(font, name, textX, ry + 3, selected ? skin.ink : skin.secondary, false);
+                int need = row.bondNeeded()[index];
+                int tagWidth = 0;
+                if (need > 0) {
+                    Component tag = skin.text(Component.translatable("bodaddon.sketchbook.locked", need));
+                    tagWidth = font.width(tag) + 4;
+                    g.drawString(font, tag, getX() + listWidth() - tagWidth + 2, ry + 3, skin.accent, false);
+                }
+                if (need > 0) {
+                    drawLock(g, textX, ry + 2, skin.accent);
+                } else {
+                    FormattedCharSequence name = skin.fit(font, Component.literal(row.options()[index]), getX() + listWidth() - textX - 2);
+                    g.drawString(font, name, textX, ry + 3, selected ? skin.ink : skin.secondary, false);
+                }
             }
             g.disableScissor();
             if (isFocused() && skin == Skin.SLATE) {
@@ -261,7 +279,7 @@ final class VariantsPanel {
                 return;
             }
             int index = pickerScroll + (int) ((my - getY()) / ROW_H);
-            if (index >= 0 && index < row.options().length && index != current) {
+            if (index >= 0 && index < row.options().length && index != current && row.bondNeeded()[index] == 0) {
                 current = index;
                 keyboardIndex = index;
                 onPick.accept(index);
@@ -289,7 +307,7 @@ final class VariantsPanel {
                 return true;
             }
             if (key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER || key == GLFW.GLFW_KEY_SPACE) {
-                if (keyboardIndex != current) {
+                if (keyboardIndex != current && row.bondNeeded()[keyboardIndex] == 0) {
                     current = keyboardIndex;
                     onPick.accept(current);
                 }
@@ -307,6 +325,16 @@ final class VariantsPanel {
 
         @Override public void playDownSound(SoundManager sounds) { }
         @Override protected void updateWidgetNarration(NarrationElementOutput out) { defaultButtonNarrationText(out); }
+    }
+
+    private static final ResourceLocation LOCK = ResourceLocation.fromNamespaceAndPath(BodAddon.MOD_ID, "textures/gui/sketchbook/lock.png");
+
+    /** A small padlock (7 by 9) standing in for the name of an option the dragon is not bonded enough to offer. */
+    private static void drawLock(GuiGraphics g, int x, int y, int argb) {
+        RenderSystem.enableBlend();
+        g.setColor((argb >> 16 & 0xFF) / 255F, (argb >> 8 & 0xFF) / 255F, (argb & 0xFF) / 255F, 1F);
+        g.blit(LOCK, x, y, 0, 0, 7, 9, 7, 9);
+        g.setColor(1F, 1F, 1F, 1F);
     }
 
     // --- palette swatches ---------------------------------------------------------------------

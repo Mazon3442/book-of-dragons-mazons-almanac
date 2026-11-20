@@ -1,0 +1,28 @@
+{
+  "providers": [
+    {
+      "type": "space",
+      "advances": {
+        " ": 5
+      }
+    },
+    {
+      "type": "bitmap",
+      "file": "bodaddon:font/sketchbook_title.png",
+      "ascent": 14,
+      "height": 19,
+      "chars": [
+        "!\"#$%&'()*+,-./0",
+        "123456789:;<=>?@",
+        "ABCDEFGHIJKLMNOP",
+        "QRSTUVWXYZ[\\]^_`",
+        "abcdefghijklmnop",
+        "qrstuvwxyz{|}~\u0000\u0000"
+      ]
+    },
+    {
+      "type": "reference",
+      "id": "minecraft:default"
+    }
+  ]
+}

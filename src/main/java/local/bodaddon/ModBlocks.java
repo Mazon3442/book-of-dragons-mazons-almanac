@@ -1,5 +1,6 @@
 package local.bodaddon;
 
+import java.util.Map;
 import java.util.Optional;
 import local.bodaddon.root.DragonRootBlock;
 import local.bodaddon.repel.DragonRepellentBlock;
@@ -15,6 +16,8 @@ import local.bodaddon.worldgen.SageLeavesBlock;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemNameBlockItem;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoublePlantBlock;
@@ -24,6 +27,7 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -60,6 +64,19 @@ public final class ModBlocks {
                     java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
                 tooltip.add(net.minecraft.network.chat.Component.translatable("item.bodaddon.dragon_root.desc1").withStyle(net.minecraft.ChatFormatting.GRAY));
                 tooltip.add(net.minecraft.network.chat.Component.translatable("item.bodaddon.dragon_root.desc2").withStyle(net.minecraft.ChatFormatting.GRAY));
+            }
+        });
+    public static final DeferredHolder<Item, ItemNameBlockItem> DRAGON_ROOT_SEEDS = ModItems.ITEMS.register("dragon_root_seeds",
+        () -> new ItemNameBlockItem(DRAGON_ROOT.get(), new Item.Properties()) {
+            @Override
+            protected BlockState getPlacementState(BlockPlaceContext context) {
+                BlockState state = getBlock().defaultBlockState().setValue(DragonRootBlock.AGE, 0);
+                return canPlace(context, state) ? state : null;
+            }
+
+            @Override
+            public void registerBlocks(Map<Block, Item> blockToItemMap, Item item) {
+                // The mature root remains the block's canonical item for pick block and translations.
             }
         });
     public static final DeferredHolder<Block, DragonRepellentBlock> DRAGON_REPELLENT_BLOCK = BLOCKS.register("dragon_repellent_block",

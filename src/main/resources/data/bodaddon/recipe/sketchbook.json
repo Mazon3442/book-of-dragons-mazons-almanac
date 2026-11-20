@@ -6,5 +6,5 @@
     { "item": "minecraft:ink_sac" },
     { "item": "minecraft:feather" }
   ],
-  "result": { "id": "bodaddon:hiccups_sketchbook", "count": 1 }
+  "result": { "id": "bodaddon:sketchbook", "count": 1 }
 }

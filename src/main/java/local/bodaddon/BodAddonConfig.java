@@ -46,6 +46,11 @@ public final class BodAddonConfig {
     public static final ModConfigSpec SPEC;
     public static final ModConfigSpec.DoubleValue TROUGH_RADIUS;
     public static final ModConfigSpec.DoubleValue STABLE_RADIUS;
+    public static final ModConfigSpec.IntValue CHEST_FEEDING_START;
+    private static final ModConfigSpec.IntValue[] SKETCHBOOK_BOND = new ModConfigSpec.IntValue[3];
+    /** Bond (0 to 100) the Sketchbook asks for a rarity: 0 COMMON, 1 UNCOMMON, 2 RARE, 3 VERY_RARE. */
+    public static int sketchbookBond(int rarity) { return rarity <= 0 ? 0 : SKETCHBOOK_BOND[Math.min(rarity, 3) - 1].get(); }
+
     private static final Map<DragonType, Map<PrimaryAttribute, ModConfigSpec.EnumValue<Rating>>> RATINGS = new EnumMap<>(DragonType.class);
 
     static {
@@ -53,6 +58,19 @@ public final class BodAddonConfig {
         b.translation(KEY + "trough").push("trough");
         TROUGH_RADIUS = b.comment("How far, in blocks, a feeding trough reaches for hungry dragons.")
             .translation(KEY + "trough.radius").defineInRange("radius", 16.0, 2.0, 64.0);
+        b.pop();
+        b.translation(KEY + "dragon_feeding").push("dragon_feeding");
+        CHEST_FEEDING_START = b.comment("A tamed dragon with a chest starts eating from it when its food drops to this level (of 100), and keeps eating until it is full or the chest has nothing it will eat.")
+            .translation(KEY + "dragon_feeding.start").defineInRange("start_eating_at", 7, 0, 99);
+        b.pop();
+        b.translation(KEY + "sketchbook").push("sketchbook");
+        String[] tiers = {"uncommon", "rare", "very_rare"};
+        int[] defaults = {25, 50, 90};
+        for (int i = 0; i < tiers.length; i++) {
+            SKETCHBOOK_BOND[i] = b.comment("Bond (0 to 100) a dragon needs before the Sketchbook offers its " + tiers[i].replace('_', ' ')
+                    + " colors and markings. Common ones are always offered. 0 unlocks the tier for everyone.")
+                .translation(KEY + "sketchbook." + tiers[i]).defineInRange(tiers[i], defaults[i], 0, 100);
+        }
         b.pop();
         b.translation(KEY + "stable_plate").push("stable_plate");
         STABLE_RADIUS = b.comment("How far, in blocks, a Stable Plate on a Dragon Roost holds tamed dragons in their stay order.")

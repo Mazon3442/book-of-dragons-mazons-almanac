@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import local.bodaddon.BodAddonConfig;
 import net.magister.bookofdragons.entity.base.dragon.DragonBase;
 import net.magister.liberanimalium.chassis.component.GenotypeComponent;
 import net.magister.liberanimalium.genetics.Locus;
@@ -31,7 +32,14 @@ public final class VariantEdits {
 
     private VariantEdits() {}
 
-    public static VariantRow[] rows(DragonBase d) {
+    /** Every row, all options free: the creative editor. */
+    public static VariantRow[] rows(DragonBase d) { return rows(d, -1); }
+
+    /**
+     * Rows for the sketchbook. {@code bond} is the owner's bond with the dragon (0 to 1000); options of a rarity that needs more
+     * are marked with the bond they need. A negative bond marks nothing.
+     */
+    public static VariantRow[] rows(DragonBase d, int bond) {
         return rowsOf(d).stream().map(r -> new VariantRow(
             r.locus().getDisplayName(),
             r.locus().name(),
@@ -39,7 +47,32 @@ public final class VariantEdits {
             r.locus().getCategory() == Locus.LocusCategory.COLOR,
             r.options().stream().map(VariantEdits::prettify).toArray(String[]::new),
             r.options().stream().map(ResourceLocation::toString).toArray(String[]::new),
-            r.current())).toArray(VariantRow[]::new);
+            r.current(),
+            bondNeeded(d.speciesId(), r, bond))).toArray(VariantRow[]::new);
+    }
+
+    /** For each option of a row, the bond (0 to 100) still missing before it may be chosen, else 0. The shown option is always free. */
+    private static int[] bondNeeded(String species, Row row, int bond) {
+        int[] needed = new int[row.options().size()];
+        if (bond < 0) return needed;
+        Map<String, List<ResourceLocation>> pool = PalettePoolRegistry.getPoolMap(species, row.locus().name());
+        for (int i = 0; i < needed.length; i++) {
+            if (i == row.current()) continue;
+            int need = BodAddonConfig.sketchbookBond(rarityOf(pool, row.options().get(i)));
+            if (need * 10 > bond) needed[i] = need;
+        }
+        return needed;
+    }
+
+    /** Index into {@link #RARITY_ORDER} of the lowest tier that lists the option; anything outside the known tiers counts as common. */
+    private static int rarityOf(Map<String, List<ResourceLocation>> pool, ResourceLocation option) {
+        if (pool == null) return 0;
+        for (int i = 0; i < RARITY_ORDER.length; i++) {
+            for (Map.Entry<String, List<ResourceLocation>> tier : pool.entrySet()) {   // the pools name their tiers in lower case
+                if (tier.getKey().equalsIgnoreCase(RARITY_ORDER[i]) && tier.getValue().contains(option)) return i;
+            }
+        }
+        return 0;
     }
 
     public static void set(DragonBase d, int rowIndex, int option) {
@@ -50,9 +83,11 @@ public final class VariantEdits {
         apply(d, row, row.options().get(option));
     }
 
-    static boolean set(DragonBase d, String locus, int slot, ResourceLocation choice) {
+    /** The sketchbook's edit: refused unless the owner's {@code bond} (0 to 1000) unlocks the option's rarity. */
+    static boolean set(DragonBase d, String locus, int slot, ResourceLocation choice, int bond) {
         for (Row row : rowsOf(d)) {
             if (row.locus().name().equals(locus) && row.slot() == slot && row.options().contains(choice)) {
+                if (bondNeeded(d.speciesId(), row, bond)[row.options().indexOf(choice)] > 0) return false;
                 return apply(d, row, choice);
             }
         }

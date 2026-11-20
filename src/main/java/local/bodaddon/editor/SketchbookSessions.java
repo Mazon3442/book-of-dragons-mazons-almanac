@@ -22,8 +22,8 @@ final class SketchbookSessions {
 
     static EditorPayloads.SketchbookPage open(ServerPlayer player, DragonBase dragon, InteractionHand hand) {
         ItemStack book = player.getItemInHand(hand);
-        if (!book.is(ModItems.HICCUPS_SKETCHBOOK.get()) || !canEdit(player, dragon)) return null;
-        VariantRow[] rows = VariantEdits.rows(dragon);
+        if (!book.is(ModItems.SKETCHBOOK.get()) || !canEdit(player, dragon)) return null;
+        VariantRow[] rows = VariantEdits.rows(dragon, dragon.getBond(player.getUUID()));
         if (rows.length == 0) return null;
         Session session = new Session(UUID.randomUUID(), new WeakReference<>(dragon));
         if (!player.isCreative()) book.shrink(1);
@@ -39,8 +39,9 @@ final class SketchbookSessions {
             OPEN.remove(player);
             return null;
         }
-        if (!VariantEdits.set(dragon, choice.locus(), choice.slot(), choice.palette())) return null;
-        return page(session, dragon, VariantEdits.rows(dragon), false);
+        int bond = dragon.getBond(player.getUUID());
+        if (!VariantEdits.set(dragon, choice.locus(), choice.slot(), choice.palette(), bond)) return null;
+        return page(session, dragon, VariantEdits.rows(dragon, bond), false);
     }
 
     static void close(ServerPlayer player, UUID token) {

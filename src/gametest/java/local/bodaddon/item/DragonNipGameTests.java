@@ -124,7 +124,7 @@ public final class DragonNipGameTests {
     }
 
     @GameTest(template = "empty")
-    public static void swordCutsNipGrassAndOtherToolsDoNot(GameTestHelper helper) {
+    public static void anyToolCutsNipGrassAndShearsTakeThePlant(GameTestHelper helper) {
         var level = helper.getLevel();
         BlockPos pos = helper.absolutePos(new BlockPos(2, 2, 2));
         level.setBlockAndUpdate(pos.below(), Blocks.GRASS_BLOCK.defaultBlockState());
@@ -140,8 +140,10 @@ public final class DragonNipGameTests {
             nip += drops.getFirst().getCount();
         }
         helper.assertTrue(nip > 64, "Cutting should sometimes yield two nip");
-        helper.assertTrue(Block.getDrops(lower, level, pos, null, null, ItemStack.EMPTY).isEmpty(), "Bare hands must not yield nip");
-        helper.assertTrue(Block.getDrops(lower, level, pos, null, null, new ItemStack(Items.IRON_AXE)).isEmpty(), "Non-sword tools must not yield nip");
+        for (ItemStack tool : new ItemStack[]{ItemStack.EMPTY, new ItemStack(Items.IRON_AXE), new ItemStack(Items.WOODEN_PICKAXE), new ItemStack(Items.STICK)}) {
+            var drops = Block.getDrops(lower, level, pos, null, null, tool);
+            helper.assertTrue(drops.size() == 1 && drops.getFirst().is(ModItems.DRAGON_NIP.get()), "Any tool or a bare hand must yield dragon nip");
+        }
         var sheared = Block.getDrops(lower, level, pos, null, null, new ItemStack(Items.SHEARS));
         helper.assertTrue(sheared.size() == 1 && sheared.getFirst().is(ModBlocks.DRAGON_NIP_GRASS_ITEM.get()), "Shears must collect the plant");
         helper.assertTrue(Block.getDrops(level.getBlockState(pos.above()), level, pos.above(), null, null, new ItemStack(Items.IRON_SWORD)).size() == 1,

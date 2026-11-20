@@ -1,6 +1,15 @@
 {
   "variants": {
-    "": {
+    "age=0": {
+      "model": "bodaddon:block/dragon_root_stage0"
+    },
+    "age=1": {
+      "model": "bodaddon:block/dragon_root_stage1"
+    },
+    "age=2": {
+      "model": "bodaddon:block/dragon_root_stage2"
+    },
+    "age=3": {
       "model": "bodaddon:block/dragon_root"
     }
   }

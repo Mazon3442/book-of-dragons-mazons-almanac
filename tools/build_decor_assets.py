@@ -11,7 +11,7 @@ import numpy as np
 from PIL import Image
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SRC = ROOT / "reference/hiccups-sketchbook/decor"
+SRC = ROOT / "reference/sketchbook/decor"
 OUT = ROOT / "src/main/resources/assets/bodaddon/textures/gui/sketchbook/decor"
 OUT.mkdir(parents=True, exist_ok=True)
 

@@ -51,6 +51,19 @@ public final class EelGameTests {
     }
 
     @GameTest(template = "empty")
+    public static void killedEelDropsAnEel(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 2, 2);
+        helper.setBlock(pos, Blocks.WATER);
+        helper.setBlock(pos.above(), Blocks.WATER);
+        EelEntity eel = helper.spawn(ModEntities.EEL.get(), pos);
+        eel.kill();
+        helper.runAfterDelay(5, () -> {
+            helper.assertItemEntityPresent(ModItems.EEL.get(), pos, 8.0);
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = "empty")
     public static void fishingModifierSwapsOnlyFishForEels(GameTestHelper helper) {
         var level = helper.getLevel();
         LootContext context = new LootContext.Builder(new LootParams.Builder(level).create(LootContextParamSets.EMPTY))

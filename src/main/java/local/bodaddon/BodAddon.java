@@ -36,13 +36,15 @@ public class BodAddon {
             .icon(() -> new ItemStack(ModItems.DRAGON_EDITOR.get()))
             .displayItems((params, out) -> {
                 out.accept(ModItems.DRAGON_EDITOR.get());
-                out.accept(ModItems.HICCUPS_SKETCHBOOK.get());
+                out.accept(ModItems.SKETCHBOOK.get());
                 out.accept(ModBlocks.FEEDING_TROUGH_ITEM.get());
                 out.accept(ModItems.DRAGON_TREAT.get());
                 out.accept(ModItems.DRAGON_NIP.get());
                 out.accept(ModBlocks.DRAGON_NIP_GRASS_ITEM.get());
                 out.accept(ModBlocks.DRAGON_ROOT_ITEM.get());
+                out.accept(ModBlocks.DRAGON_ROOT_SEEDS.get());
                 out.accept(ModItems.EEL.get());
+                out.accept(ModItems.COOKED_EEL.get());
                 out.accept(ModItems.EEL_BUCKET.get());
                 out.accept(ModItems.EEL_SPAWN_EGG.get());
                 out.accept(ModItems.DRAGON_REPELLENT.get());
@@ -74,6 +76,7 @@ public class BodAddon {
         NeoForge.EVENT_BUS.register(DragonNipItem.class);
         NeoForge.EVENT_BUS.register(SagefruitItem.class);
         NeoForge.EVENT_BUS.register(DragonFriendships.class);
+        NeoForge.EVENT_BUS.register(local.bodaddon.eel.EelDread.class);
         NeoForge.EVENT_BUS.register(local.bodaddon.dragon.DragonSaddlebagFeeding.class);
         TABS.register(modBus);
     }

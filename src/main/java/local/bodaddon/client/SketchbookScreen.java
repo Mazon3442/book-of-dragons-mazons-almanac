@@ -232,9 +232,8 @@ final class SketchbookScreen extends Screen {
     }
 
     private void drawPortrait(GuiGraphics g, int bookX, int bookY, int targetHeight, int spread) {
-        SketchbookDecor.drawPortraitDoodles(g, bookX, bookY, spread);
-        Component title = PAPER.text(getTitle());
-        g.drawString(font, title, bookX + 70 - font.width(title) / 2, bookY + 20, PAPER.ink, false);
+        Component title = PAPER.title(getTitle());
+        g.drawString(font, title, bookX + 70 - font.width(title) / 2, bookY + 16, PAPER.ink, false);
         var name = PAPER.fit(font, Component.literal(state.name()), 101);
         g.drawString(font, name, bookX + 70 - font.width(name) / 2, bookY + 37, PAPER.secondary, false);
         DragonBase target = dragon();
@@ -289,12 +288,15 @@ final class SketchbookScreen extends Screen {
 
     private void drawSheet(GuiGraphics g, int x, int y, int sheetPage, int mx, int my, boolean live) {
         drawBlankSheet(g, x, y);
-        SketchbookDecor.drawPageDoodles(g, x, y, sheetPage);
         boolean picking = live && options != null;
         Component heading = picking ? Component.literal(variants.shown[variants.pickerRow].label())
             : Component.translatable("bodaddon.sketchbook.heading");
-        int headingWidth = picking ? 64 : ROW_W;
-        g.drawString(font, PAPER.fit(font, heading, headingWidth), x + ROW_X, y + 11, PAPER.ink, false);
+        if (picking) {
+            g.drawString(font, PAPER.fit(font, heading, 64), x + ROW_X, y + 11, PAPER.ink, false);
+        } else {
+            Component title = PAPER.title(heading);
+            g.drawString(font, title, x + (SHEET_W - font.width(title)) / 2, y + 8, PAPER.ink, false);
+        }
         if (picking) return;
         if (variants.shown.length == 0) {
             g.drawWordWrap(font, PAPER.text(Component.translatable("bodaddon.sketchbook.no_variants")), x + ROW_X, y + ROW_Y, ROW_W, PAPER.secondary);

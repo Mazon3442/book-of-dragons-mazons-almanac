@@ -34,7 +34,7 @@ Mazon's Almanac is an addon for [Book of Dragons](https://www.curseforge.com/min
 | <img src="docs/images/items/dragon_repellent.png" width="48"> | **Dragon Repellent** | Drink it for 8 minutes of Dragon Scent and wild dragons keep their distance. Also a placeable block. |
 | <img src="docs/images/items/eel.png" width="48"> | **Eel** | A new catch when you fish in rivers and swamps. |
 | <img src="docs/images/items/dragon_editor.png" width="48"> | **Dragon Editor** | Creative only. Opens the editor below. |
-| | **Hiccup's Sketchbook** | Edit the colors and markings of a dragon you've tamed. |
+| | **Sketchbook** | Edit the colors and markings of a dragon you've tamed. |
 
 Dragon Root is a block that drives off wild dragons within 6 blocks when you place it.
 
@@ -52,18 +52,18 @@ Dragon Root is a block that drives off wild dragons within 6 blocks when you pla
 | Dragon Repellent | Eel, Dragon Root, glass bottle (shapeless) |
 | Dragon Repellent Block | Two Dragon Repellent and two moss blocks (shapeless) |
 | Dragon Editor | Creative inventory only |
-| Hiccup's Sketchbook | Creative inventory or `/give @s bodaddon:hiccups_sketchbook`. Survival recipe pending. |
+| Sketchbook | Craft a Book, an Ink Sac and a Feather together, or use the creative inventory or `/give @s bodaddon:sketchbook`. |
 
 ### Finding and gathering
 
 | What | Where | How to get it |
 |---|---|---|
-| Dragon Nip | Dragon Nip Grass in plains, sunflower plains, meadows, forests, taigas, and windswept hills and forests. About 1 in 40 chunks has a patch. | Break the grass with a **sword** for 1 to 2 Dragon Nip. Other tools drop nothing. Shears give you the grass itself to replant. |
+| Dragon Nip | Dragon Nip Grass in plains, sunflower plains, meadows, forests, taigas, and windswept hills and forests. About 1 in 40 chunks has a patch. | Break the grass with any tool, or your bare hand, for 1 to 2 Dragon Nip. Shears give you the grass itself to replant. |
 | Dragon Root | Swamps, mangrove swamps, dark forests, and old growth pine and spruce taigas. About 1 in 40 chunks has a small patch. | Break it with anything. |
 | Sage trees | Forests, flower forests, birch forests, old growth birch forests, and dark forests. Rare: about 1 in 300 chunks. | Break the leaves for Sagefruit and saplings. A hoe is the fastest tool. |
 | Sagefruit | Fruiting sage leaves. | Break them without shears or Silk Touch. Those give you the leaf block instead. |
 | Sage Sapling | Sage leaves. | A 5% drop per leaf, up to 10% with Fortune III. |
-| Eel | Rivers, swamps, and mangrove swamps. | About 1 in 8 fish you catch there is an eel. Wild eels also spawn in those biomes, but rarely. |
+| Eel | Rivers, swamps, and mangrove swamps. | About 1 in 8 fish you catch there is an eel. Wild eels also spawn in those biomes, but rarely. Cook one in a furnace, smoker, or campfire for Cooked Eel, which restores as much as cooked cod. |
 
 ### Setting things up
 
@@ -74,9 +74,9 @@ Dragon Root is a block that drives off wild dragons within 6 blocks when you pla
 
 </details>
 
-## Hiccup's Sketchbook
+## Sketchbook
 
-Right-click your own tamed dragon with the sketchbook. Opening it consumes one book in survival. You can make as many color and marking changes as you like during that session, with every palette for the species available. Click a row to open the scrollable palette and zoom the live dragon toward the area you're editing. Drag the dragon to turn it, or scroll over it to zoom.
+Right-click your own tamed dragon with the sketchbook. Opening it consumes one book in survival. You can make as many color and marking changes as you like during that session, and the more your dragon trusts you, the more of its colors and markings it offers. Common ones are always there; uncommon, rare and very rare ones unlock at bond 25, 50 and 90 (out of 100, set in the config). Locked options show the bond they need. Click a row to open the scrollable palette and zoom the live dragon toward the area you're editing. Drag the dragon to turn it, or scroll over it to zoom.
 
 Use the page corners, Left and Right, or scroll over the right-hand page to turn pages. Set `pageFlip` in `bodaddon-client.toml` to `MESH` (default), `SIMPLE`, or `OFF`.
 

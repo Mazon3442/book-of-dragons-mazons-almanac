@@ -1,6 +1,6 @@
 # Art and GUI notes
 
-What we learned while planning Hiccup's Sketchbook (a Variants-only colour/gene editor for tamed dragons).
+What we learned while planning the Sketchbook (a Variants-only colour/gene editor for tamed dragons).
 Complements `DESIGN.md` (house style and palette). Not a spec.
 
 ## What makes the Book of Dragons book look so good
@@ -18,7 +18,7 @@ learn the techniques, never copy its textures, font or code.
 
 ## How ours should differ
 
-- Hiccup's sketchbook: stitched leather cover, tan paper, pencil and ink sketches. Book of Dragons uses coloured
+- Sketchbook: stitched leather cover, tan paper, pencil and ink sketches. Book of Dragons uses coloured
   parchment pages with tab ribbons.
 - Own flip animation (not their curl), own pencil-style font, red ribbon bookmark, masking-tape frames, peeling corner.
 
@@ -81,7 +81,7 @@ Layout: leather cover with stitching and brass corners, two paper pages with gut
 five colour rows (Base, Dorsal, Underbelly, Gradient, Body markings) with chevrons and swatches, page indicator,
 peeling corner, red ribbon. Not yet built in-game.
 
-Reference photos of the real sketchbook are in `reference/hiccups-sketchbook/` (git-ignored).
+Reference photos of the real sketchbook are in `reference/sketchbook/` (git-ignored).
 
 ## Mockup v2 review (user feedback)
 

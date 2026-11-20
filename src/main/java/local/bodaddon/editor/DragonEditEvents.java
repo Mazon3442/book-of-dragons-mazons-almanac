@@ -16,9 +16,9 @@ public final class DragonEditEvents {
 
     @SubscribeEvent
     public static void onDragonInteract(PlayerInteractEvent.EntityInteract event) {
-        if (!(event.getTarget() instanceof DragonBase dragon) || !event.getItemStack().is(ModItems.HICCUPS_SKETCHBOOK.get())) return;
+        if (!(event.getTarget() instanceof DragonBase dragon) || !event.getItemStack().is(ModItems.SKETCHBOOK.get())) return;
         // The dragon can handle the interaction itself before vanilla reaches the held item.
-        event.setCancellationResult(ModItems.HICCUPS_SKETCHBOOK.get()
+        event.setCancellationResult(ModItems.SKETCHBOOK.get()
             .interactLivingEntity(event.getItemStack(), event.getEntity(), dragon, event.getHand()));
         event.setCanceled(true);
     }

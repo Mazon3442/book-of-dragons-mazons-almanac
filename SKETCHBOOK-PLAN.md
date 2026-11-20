@@ -1,11 +1,11 @@
-# Plan: Hiccup's Sketchbook (implementation brief)
+# Plan: Sketchbook (implementation brief)
 
 Hand-off brief for the agent implementing this. Read it fully, then read `DESIGN.md` and `ART-NOTES.md`.
 Project: NeoForge 21.1, Minecraft 1.21.1, Java 21, mod id `bodaddon`, package `local.bodaddon`.
 
 ## Goal
 
-A survival-craftable, reusable item, **Hiccup's Sketchbook**. Right-click one of your own tamed dragons and a
+A survival-craftable, reusable item, **Sketchbook**. Right-click one of your own tamed dragons and a
 sketchbook GUI opens. It edits **only the dragon's colours and markings** (the Variants data), never bond, vitals,
 personality or friendships. Pages turn with a real 3D page-flip animation.
 
@@ -23,7 +23,7 @@ and a stricter, survival-safe permission model. Do not copy-paste the Variants c
 
 ## Art you are given
 
-In `reference/hiccups-sketchbook/art/` (git-ignored folder; copy what you use into the resources):
+In `reference/sketchbook/art/` (git-ignored folder; copy what you use into the resources):
 
 - `book_open.png`: 256x171, the open book. Layered page stacks, stitched spine, ribbon at the bottom, torn cover edges.
   The left page contains an inset paper card where the live dragon preview goes. The right page is blank.
@@ -53,7 +53,7 @@ Book of Dragons is All Rights Reserved. Learn from the idea of its page turn; ne
 
 ### 1. Item and permissions (server)
 
-1. Register `hiccups_sketchbook` in `ModItems` (`stacksTo(1)`), class `editor/SketchbookItem`. Add a flat handheld
+1. Register `sketchbook` in `ModItems` (`stacksTo(1)`), class `editor/SketchbookItem`. Add a flat handheld
    item model and a lang entry, and a recipe JSON under `data/bodaddon/recipe/`.
 2. `interactLivingEntity`: only `DragonBase` targets; client side returns `SUCCESS`; server side requires
    `dragon.isTame()` and that the player is the owner (use the owner API the existing code uses, `dragon.ownerId()`);

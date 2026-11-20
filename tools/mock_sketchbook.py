@@ -1,4 +1,4 @@
-"""Mockup v2 of Hiccup's Sketchbook (Variants-only editor). Native 256x168, shown at 4x.
+"""Mockup v2 of Sketchbook (Variants-only editor). Native 256x168, shown at 4x.
 Goals from review: layered page stacks with depth, nothing perfectly square, hand-made stitching.
 Techniques: random-walk edges (wobble that persists, not per-pixel jitter), stacked page layers with staggered edges,
 pages that bow toward the gutter, paper cards with torn edges + drop shadow, irregular stitches, clustered noise only.

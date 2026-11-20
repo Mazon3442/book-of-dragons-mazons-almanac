@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "bodaddon:dragon_root"
+    }
+  ],
+  "result": {
+    "id": "bodaddon:dragon_root_seeds",
+    "count": 2
+  }
+}

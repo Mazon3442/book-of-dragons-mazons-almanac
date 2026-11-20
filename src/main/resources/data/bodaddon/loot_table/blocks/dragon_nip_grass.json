@@ -30,15 +30,19 @@
           "children": [
             {
               "type": "minecraft:item",
-              "name": "bodaddon:dragon_nip",
+              "name": "bodaddon:dragon_nip_grass",
               "conditions": [
                 {
                   "condition": "minecraft:match_tool",
                   "predicate": {
-                    "items": "#minecraft:swords"
+                    "items": "minecraft:shears"
                   }
                 }
-              ],
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "bodaddon:dragon_nip",
               "functions": [
                 {
                   "function": "minecraft:set_count",
@@ -48,18 +52,6 @@
                     "max": 2.0
                   },
                   "add": false
-                }
-              ]
-            },
-            {
-              "type": "minecraft:item",
-              "name": "bodaddon:dragon_nip_grass",
-              "conditions": [
-                {
-                  "condition": "minecraft:match_tool",
-                  "predicate": {
-                    "items": "minecraft:shears"
-                  }
                 }
               ]
             }
@@ -97,15 +89,19 @@
           "children": [
             {
               "type": "minecraft:item",
-              "name": "bodaddon:dragon_nip",
+              "name": "bodaddon:dragon_nip_grass",
               "conditions": [
                 {
                   "condition": "minecraft:match_tool",
                   "predicate": {
-                    "items": "#minecraft:swords"
+                    "items": "minecraft:shears"
                   }
                 }
-              ],
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "bodaddon:dragon_nip",
               "functions": [
                 {
                   "function": "minecraft:set_count",
@@ -115,18 +111,6 @@
                     "max": 2.0
                   },
                   "add": false
-                }
-              ]
-            },
-            {
-              "type": "minecraft:item",
-              "name": "bodaddon:dragon_nip_grass",
-              "conditions": [
-                {
-                  "condition": "minecraft:match_tool",
-                  "predicate": {
-                    "items": "minecraft:shears"
-                  }
                 }
               ]
             }
