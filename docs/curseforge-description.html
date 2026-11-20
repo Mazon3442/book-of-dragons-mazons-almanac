@@ -16,7 +16,9 @@
 <li>Start the game and look for the <strong>Mazon's Almanac</strong> tab in the creative inventory.</li>
 </ol>
 <h2>What's in the Almanac</h2>
-<img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/overview.png" alt="Every item, block, and plant in Mazon's Almanac, as inventory icons and placed models" width="100%">
+<img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/all-items-blockbench.png" alt="Every item in Mazon's Almanac as an inventory icon" width="100%">
+<img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/3d-models-blockbench.png" alt="The 3D models: held, placed and planted" width="100%">
+<img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/dragon-root-stages-blockbench.png" alt="The four growth stages of Dragon Root" width="100%">
 <table border="1" cellpadding="6" cellspacing="0">
 <thead>
 <tr>
@@ -64,7 +66,17 @@
 <tr>
 <td><img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/eel.png" width="48"></td>
 <td><strong>Eel</strong></td>
-<td>A new catch when you fish in rivers and swamps.</td>
+<td>A new catch when you fish in rivers and swamps. Dragons are scared of live eels and disgusted by the item.</td>
+</tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/cooked_eel.png" width="48"></td>
+<td><strong>Cooked Eel</strong></td>
+<td>Cook an Eel in a furnace, smoker, or campfire. Restores as much hunger as cooked cod.</td>
+</tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/dragon_root_seeds.png" width="48"></td>
+<td><strong>Dragon Root Seeds</strong></td>
+<td>Plant them in dirt or farmland and grow your own Dragon Root.</td>
 </tr>
 <tr>
 <td><img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/dragon_editor.png" width="48"></td>
@@ -72,13 +84,13 @@
 <td>Creative only. Opens the editor below.</td>
 </tr>
 <tr>
-<td></td>
+<td><img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/sketchbook.png" width="48"></td>
 <td><strong>Sketchbook</strong></td>
-<td>Edit the colors and markings of a dragon you've tamed.</td>
+<td>Edit the colors and markings of a dragon you've tamed. The more it trusts you, the more looks it offers.</td>
 </tr>
 </tbody>
 </table>
-<p>Dragon Root is a block that drives off wild dragons within 6 blocks when you place it.</p>
+<p>Dragon Root is a plant that grows in four stages. Once it is fully grown it drives off wild dragons within 6 blocks.</p>
 <details>
 <summary><b>How to get everything</b></summary>
 <h3>Crafting</h3>
@@ -107,6 +119,10 @@
 <td>Three iron ingots on top, then iron, leather, iron below</td>
 </tr>
 <tr>
+<td>Dragon Root Seeds (makes 2)</td>
+<td>One Dragon Root</td>
+</tr>
+<tr>
 <td>Dragon Repellent</td>
 <td>Eel, Dragon Root, glass bottle (shapeless)</td>
 </tr>
@@ -120,7 +136,11 @@
 </tr>
 <tr>
 <td>Sketchbook</td>
-<td>Craft a Book, an Ink Sac and a Feather together, or use the creative inventory or <code>/give @s bodaddon:sketchbook</code>.</td>
+<td>Book, Ink Sac, Feather (shapeless)</td>
+</tr>
+<tr>
+<td>Cooked Eel</td>
+<td>Cook an Eel in a furnace, smoker, or campfire</td>
 </tr>
 </tbody>
 </table>
@@ -142,7 +162,12 @@
 <tr>
 <td>Dragon Root</td>
 <td>Swamps, mangrove swamps, dark forests, and old growth pine and spruce taigas. About 1 in 40 chunks has a small patch.</td>
-<td>Break it with anything.</td>
+<td>Break a fully grown one with anything for Dragon Root. A young one drops seeds.</td>
+</tr>
+<tr>
+<td>Dragon Root Seeds</td>
+<td>Young Dragon Root, or craft them from a Dragon Root.</td>
+<td>Plant them on dirt or farmland.</td>
 </tr>
 <tr>
 <td>Sage trees</td>
@@ -171,6 +196,9 @@
 <li><strong>Feeding Trough:</strong> place it and dragons within 16 blocks come to eat. You can change the range in the config.</li>
 <li><strong>Stable Plate:</strong> right-click a Dragon Roost with it to link them, then place it like a sign within 24 blocks of the roost. Tamed dragons in that area keep their stay order. You can change the range in the config.</li>
 <li><strong>Dragon Treat and Dragon Poultice:</strong> use them on your own tamed dragon. The poultice takes 60 seconds to work and then cuts an hour off the injury.</li>
+<li><strong>Dragon Root Seeds:</strong> plant them on dirt, grass, or farmland in light level 9 or more. The plant grows through four stages and only the last one repels dragons. It grows about two and a half times faster on farmland than on plain dirt, and Bone Meal moves it up a stage.</li>
+<li><strong>Chest feeding:</strong> a tamed dragon with a chest starts eating from it when its food drops to 70 out of 100, and keeps eating until it is full or the chest has nothing it will eat. You can change the start level in the config.</li>
+<li><strong>Eels and dragons:</strong> every dragon, wild or tamed, backs away from live eels, eel items and buckets of eel, and refuses one if you offer it.</li>
 <li><strong>Dragon Nip and Sagefruit:</strong> feed them to a wild dragon or one of your own. Nip calms it for five minutes. Sagefruit makes it befriend every dragon within 32 blocks.</li>
 </ul>
 </details>

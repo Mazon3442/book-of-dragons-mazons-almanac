@@ -61,7 +61,7 @@ public final class BodAddonConfig {
         b.pop();
         b.translation(KEY + "dragon_feeding").push("dragon_feeding");
         CHEST_FEEDING_START = b.comment("A tamed dragon with a chest starts eating from it when its food drops to this level (of 100), and keeps eating until it is full or the chest has nothing it will eat.")
-            .translation(KEY + "dragon_feeding.start").defineInRange("start_eating_at", 7, 0, 99);
+            .translation(KEY + "dragon_feeding.start").defineInRange("start_eating_at", 70, 0, 99);
         b.pop();
         b.translation(KEY + "sketchbook").push("sketchbook");
         String[] tiers = {"uncommon", "rare", "very_rare"};

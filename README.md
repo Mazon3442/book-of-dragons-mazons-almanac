@@ -21,7 +21,11 @@ Mazon's Almanac is an addon for [Book of Dragons](https://www.curseforge.com/min
 
 ## What's in the Almanac
 
-<img src="docs/images/overview.png" alt="Every item, block, and plant in Mazon's Almanac, as inventory icons and placed models" width="100%">
+<img src="docs/images/all-items-blockbench.png" alt="Every item in Mazon's Almanac as an inventory icon" width="100%">
+
+<img src="docs/images/3d-models-blockbench.png" alt="The 3D models: held, placed and planted" width="100%">
+
+<img src="docs/images/dragon-root-stages-blockbench.png" alt="The four growth stages of Dragon Root" width="100%">
 
 | | Item | What it does |
 |---|---|---|
@@ -32,11 +36,13 @@ Mazon's Almanac is an addon for [Book of Dragons](https://www.curseforge.com/min
 | <img src="docs/images/items/feeding_trough.png" width="48"> | **Feeding Trough** | Hungry dragons nearby walk over and eat on their own. |
 | <img src="docs/images/items/stable_plate.png" width="48"> | **Stable Plate and Sign** | Link a plate to a Dragon Roost and name your stable. Tamed dragons near the roost stay put. |
 | <img src="docs/images/items/dragon_repellent.png" width="48"> | **Dragon Repellent** | Drink it for 8 minutes of Dragon Scent and wild dragons keep their distance. Also a placeable block. |
-| <img src="docs/images/items/eel.png" width="48"> | **Eel** | A new catch when you fish in rivers and swamps. |
+| <img src="docs/images/items/eel.png" width="48"> | **Eel** | A new catch when you fish in rivers and swamps. Dragons are scared of live eels and disgusted by the item. |
+| <img src="docs/images/items/cooked_eel.png" width="48"> | **Cooked Eel** | Cook an Eel in a furnace, smoker, or campfire. Restores as much hunger as cooked cod. |
+| <img src="docs/images/items/dragon_root_seeds.png" width="48"> | **Dragon Root Seeds** | Plant them in dirt or farmland and grow your own Dragon Root. |
 | <img src="docs/images/items/dragon_editor.png" width="48"> | **Dragon Editor** | Creative only. Opens the editor below. |
-| | **Sketchbook** | Edit the colors and markings of a dragon you've tamed. |
+| <img src="docs/images/items/sketchbook.png" width="48"> | **Sketchbook** | Edit the colors and markings of a dragon you've tamed. The more it trusts you, the more looks it offers. |
 
-Dragon Root is a block that drives off wild dragons within 6 blocks when you place it.
+Dragon Root is a plant that grows in four stages. Once it is fully grown it drives off wild dragons within 6 blocks.
 
 <details>
 <summary><b>How to get everything</b></summary>
@@ -49,17 +55,20 @@ Dragon Root is a block that drives off wild dragons within 6 blocks when you pla
 | Dragon Poultice | Paper, moss block, honey bottle (shapeless) |
 | Feeding Trough | Wooden slabs across the top and middle, sticks for the legs (`S S` / `SSS` / `L L`) |
 | Stable Plate | Three iron ingots on top, then iron, leather, iron below |
+| Dragon Root Seeds (makes 2) | One Dragon Root |
 | Dragon Repellent | Eel, Dragon Root, glass bottle (shapeless) |
 | Dragon Repellent Block | Two Dragon Repellent and two moss blocks (shapeless) |
 | Dragon Editor | Creative inventory only |
-| Sketchbook | Craft a Book, an Ink Sac and a Feather together, or use the creative inventory or `/give @s bodaddon:sketchbook`. |
+| Sketchbook | Book, Ink Sac, Feather (shapeless) |
+| Cooked Eel | Cook an Eel in a furnace, smoker, or campfire |
 
 ### Finding and gathering
 
 | What | Where | How to get it |
 |---|---|---|
 | Dragon Nip | Dragon Nip Grass in plains, sunflower plains, meadows, forests, taigas, and windswept hills and forests. About 1 in 40 chunks has a patch. | Break the grass with any tool, or your bare hand, for 1 to 2 Dragon Nip. Shears give you the grass itself to replant. |
-| Dragon Root | Swamps, mangrove swamps, dark forests, and old growth pine and spruce taigas. About 1 in 40 chunks has a small patch. | Break it with anything. |
+| Dragon Root | Swamps, mangrove swamps, dark forests, and old growth pine and spruce taigas. About 1 in 40 chunks has a small patch. | Break a fully grown one with anything for Dragon Root. A young one drops seeds. |
+| Dragon Root Seeds | Young Dragon Root, or craft them from a Dragon Root. | Plant them on dirt or farmland. |
 | Sage trees | Forests, flower forests, birch forests, old growth birch forests, and dark forests. Rare: about 1 in 300 chunks. | Break the leaves for Sagefruit and saplings. A hoe is the fastest tool. |
 | Sagefruit | Fruiting sage leaves. | Break them without shears or Silk Touch. Those give you the leaf block instead. |
 | Sage Sapling | Sage leaves. | A 5% drop per leaf, up to 10% with Fortune III. |
@@ -70,6 +79,9 @@ Dragon Root is a block that drives off wild dragons within 6 blocks when you pla
 - **Feeding Trough:** place it and dragons within 16 blocks come to eat. You can change the range in the config.
 - **Stable Plate:** right-click a Dragon Roost with it to link them, then place it like a sign within 24 blocks of the roost. Tamed dragons in that area keep their stay order. You can change the range in the config.
 - **Dragon Treat and Dragon Poultice:** use them on your own tamed dragon. The poultice takes 60 seconds to work and then cuts an hour off the injury.
+- **Dragon Root Seeds:** plant them on dirt, grass, or farmland in light level 9 or more. The plant grows through four stages and only the last one repels dragons. It grows about two and a half times faster on farmland than on plain dirt, and Bone Meal moves it up a stage.
+- **Chest feeding:** a tamed dragon with a chest starts eating from it when its food drops to 70 out of 100, and keeps eating until it is full or the chest has nothing it will eat. You can change the start level in the config.
+- **Eels and dragons:** every dragon, wild or tamed, backs away from live eels, eel items and buckets of eel, and refuses one if you offer it.
 - **Dragon Nip and Sagefruit:** feed them to a wild dragon or one of your own. Nip calms it for five minutes. Sagefruit makes it befriend every dragon within 32 blocks.
 
 </details>

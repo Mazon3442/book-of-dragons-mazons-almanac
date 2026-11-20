@@ -39,7 +39,7 @@ public final class DragonSaddlebagGameTests {
         ItemStack food = java.util.stream.Stream.of(Items.COD, Items.SALMON, Items.BEEF, Items.COOKED_BEEF, Items.COOKED_COD)
             .map(item -> new ItemStack(item, 3)).filter(dragon::isFood).findFirst().orElseThrow();
         dragon.getInventory().setItem(0, food.copy());
-        dragon.getNeedsSystem().setFoodLevel(50);
+        dragon.getNeedsSystem().setFoodLevel(90);
         helper.runAfterDelay(80, () -> {
             helper.assertTrue(dragon.getInventory().getItem(0).getCount() == 3, "A dragon above the hunger level must not eat");
             helper.succeed();
