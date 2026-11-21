@@ -80,7 +80,7 @@ public final class SageTreeGameTests {
         helper.assertTrue(desert.getGenerationSettings().features().stream().noneMatch(set -> set.contains(placed)),
             "Sage trees must not generate in deserts");
         var json = PlacedFeature.DIRECT_CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, placed.value()).getOrThrow();
-        helper.assertTrue(json.toString().contains("chance:300"), "Wild trees must use one placement attempt per 300 eligible chunks on average");
+        helper.assertTrue(json.toString().contains("chance:40"), "Wild trees must use one placement attempt per 40 eligible chunks on average");
         helper.succeed();
     }
 

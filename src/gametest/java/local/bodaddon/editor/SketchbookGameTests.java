@@ -160,6 +160,25 @@ public final class SketchbookGameTests {
         helper.succeed();
     }
 
+    /** What a lasso or capture item does: write the dragon to NBT, remove it, and later read it into a fresh entity. */
+    @GameTest(template = "empty")
+    public static void editedLooksSurviveSavingAndLoading(GameTestHelper helper) {
+        DragonBase dragon = dragon(helper);
+        VariantRow[] before = VariantEdits.rows(dragon);
+        for (int i = 0; i < before.length; i++) VariantEdits.set(dragon, i, (before[i].current() + 1) % before[i].options().length);
+        VariantRow[] edited = VariantEdits.rows(dragon);
+
+        DragonBase loaded = ModEntities.TERRIBLE_TERROR.get().create(helper.getLevel());
+        loaded.load(dragon.saveWithoutId(new net.minecraft.nbt.CompoundTag()));
+        VariantRow[] after = VariantEdits.rows(loaded);
+        helper.assertTrue(after.length == edited.length, "The loaded dragon must offer the same rows: " + edited.length + " vs " + after.length);
+        for (int i = 0; i < edited.length; i++) {
+            helper.assertTrue(after[i].current() == edited[i].current(),
+                "Row " + i + " (" + edited[i].label() + ") changed after saving and loading: " + edited[i].current() + " -> " + after[i].current());
+        }
+        helper.succeed();
+    }
+
     private static DragonBase dragon(GameTestHelper helper) {
         DragonBase dragon = helper.spawnWithNoFreeWill(ModEntities.TERRIBLE_TERROR.get(), 2, 2, 2);
         dragon.finalizeSpawn(helper.getLevel(), helper.getLevel().getCurrentDifficultyAt(dragon.blockPosition()), MobSpawnType.COMMAND, null);
