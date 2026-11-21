@@ -2,6 +2,11 @@
 
 All notable changes to Book of Dragons: Mazon's Almanac. Newest first.
 
+## 0.3.1
+
+### Changed
+- **Sage trees:** they now generate about 1 in 40 chunks, up from 1 in 300, so Sagefruit is easier to find.
+
 ## 0.3.0
 
 ### New

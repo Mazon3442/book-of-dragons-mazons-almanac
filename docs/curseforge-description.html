@@ -1,20 +1,13 @@
 <p align="center" style="text-align:center">
   <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/banner.png" alt="Book of Dragons: Mazon's Almanac" width="100%">
 </p>
-<p align="center" style="text-align:center"><b>Raise your dragons like a real Viking: earn their trust, heal their wounds, and shape them your way.</b></p>
 <p align="center" style="text-align:center">
   <img alt="Minecraft 1.21.1" src="https://img.shields.io/badge/Minecraft-1.21.1-2fb3a8?style=for-the-badge">
   <img alt="NeoForge" src="https://img.shields.io/badge/NeoForge-21.1-e2672a?style=for-the-badge">
   <img alt="Java 21" src="https://img.shields.io/badge/Java-21-3b2358?style=for-the-badge">
   <img alt="MIT license" src="https://img.shields.io/badge/license-MIT-444?style=for-the-badge">
 </p>
-<p>Mazon's Almanac is an addon for <a href="https://www.curseforge.com/minecraft/mc-mods/book-of-dragons">Book of Dragons</a>. It adds the gear a dragon rider would actually carry: ways to win over wild dragons, treat injured ones, run a stable, and tweak every dragon to your liking.</p>
-<h2>Quick start</h2>
-<ol>
-<li>Install NeoForge 21.1 for Minecraft 1.21.1 and Java 21.</li>
-<li>Drop Book of Dragons, Fauna Engine, and this mod into your <code>mods</code> folder.</li>
-<li>Start the game and look for the <strong>Mazon's Almanac</strong> tab in the creative inventory.</li>
-</ol>
+<p>Mazon's Almanac is an addon for <a href="https://www.curseforge.com/minecraft/mc-mods/book-of-dragons">Book of Dragons</a>. It adds items for calming and taming wild dragons, healing injured ones, and running a stable, plus a Sketchbook for editing a dragon's colors and markings.</p>
 <h2>What's in the Almanac</h2>
 <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/all-items-blockbench.png" alt="Every item in Mazon's Almanac as an inventory icon" width="100%">
 <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/3d-models-blockbench.png" alt="The 3D models: held, placed and planted" width="100%">
@@ -91,8 +84,7 @@
 </tbody>
 </table>
 <p>Dragon Root is a plant that grows in four stages. Once it is fully grown it drives off wild dragons within 6 blocks.</p>
-<details>
-<summary><b>How to get everything</b></summary>
+<h2>How to get everything</h2>
 <h3>Crafting</h3>
 <table border="1" cellpadding="6" cellspacing="0">
 <thead>
@@ -171,7 +163,7 @@
 </tr>
 <tr>
 <td>Sage trees</td>
-<td>Forests, flower forests, birch forests, old growth birch forests, and dark forests. Rare: about 1 in 300 chunks.</td>
+<td>Forests, flower forests, birch forests, old growth birch forests, and dark forests. Uncommon: about 1 in 40 chunks.</td>
 <td>Break the leaves for Sagefruit and saplings. A hoe is the fastest tool.</td>
 </tr>
 <tr>
@@ -201,7 +193,6 @@
 <li><strong>Eels and dragons:</strong> every dragon, wild or tamed, backs away from live eels, eel items and buckets of eel, and refuses one if you offer it.</li>
 <li><strong>Dragon Nip and Sagefruit:</strong> feed them to a wild dragon or one of your own. Nip calms it for five minutes. Sagefruit makes it befriend every dragon within 32 blocks.</li>
 </ul>
-</details>
 <h2>Sketchbook</h2>
 <p>Right-click your own tamed dragon with the sketchbook. Opening it consumes one book in survival. You can make multiple color and marking changes in that session, and the more your dragon trusts you, the more of its colors and markings it offers. Common ones are always there; uncommon, rare and very rare ones unlock at bond 25, 50 and 90 (out of 100, set in the config). Locked options show the bond they need. Click a row for the scrollable palette and a closer view of the area you're editing.</p>
 <p>Turn pages with the page corners, Left and Right, or scroll over the right-hand page. The client config offers mesh, simple, and off page turns.</p>
@@ -256,17 +247,8 @@
 </tr>
 </tbody>
 </table>
-<details>
-<summary>Config options</summary>
-<p>You can change how far feeding troughs and stable plates reach. Every species also has editable letter grades for its stats.</p>
-</details>
-<details>
-<summary>Building from source</summary>
-<p>The build compiles against the Book of Dragons and Fauna Engine jars, which aren't included here. Put <code>bookofdragons-1.4.2-1.21.1.jar</code> and <code>faunaengine-1.3-1.21.1-neoforge.jar</code> in a <code>libs/</code> folder in the project root. Add <code>spatial-gui-1.11.0-1.21.1-neoforge.jar</code> there too, since the Spatial GUI fix compiles against it. Then run:</p>
-<pre><code class="language-bash">./gradlew build
-</code></pre>
-<p>The mod jar ends up in <code>build/libs/</code>. The pixel art rules are in <a href="https://github.com/Mazon3442/book-of-dragons-mazons-almanac/blob/main/DESIGN.md">DESIGN.md</a>, and the scripts that draw the textures are in <code>tools/</code>.</p>
-</details>
+<h2>Config options</h2>
+<p>You can change how far feeding troughs and stable plates reach, the food level at which a dragon starts eating from its chest, and the bond the Sketchbook asks for each rarity. Every species also has editable letter grades for its stats.</p>
 <h2>License</h2>
 <p>Released under the <a href="https://github.com/Mazon3442/book-of-dragons-mazons-almanac/blob/main/LICENSE">MIT license</a>.</p>
 <p>This is a fan project. It is not affiliated with or endorsed by DreamWorks, Mojang, or the authors of Book of Dragons.</p>

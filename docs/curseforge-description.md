@@ -1,0 +1,142 @@
+<p align="center" style="text-align:center">
+  <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/banner.png" alt="Book of Dragons: Mazon's Almanac" width="100%">
+</p>
+
+<p align="center" style="text-align:center"><b>Raise your dragons like a real Viking: earn their trust, heal their wounds, and shape them your way.</b></p>
+
+<p align="center" style="text-align:center">
+  <img alt="Minecraft 1.21.1" src="https://img.shields.io/badge/Minecraft-1.21.1-2fb3a8?style=for-the-badge">
+  <img alt="NeoForge" src="https://img.shields.io/badge/NeoForge-21.1-e2672a?style=for-the-badge">
+  <img alt="Java 21" src="https://img.shields.io/badge/Java-21-3b2358?style=for-the-badge">
+  <img alt="MIT license" src="https://img.shields.io/badge/license-MIT-444?style=for-the-badge">
+</p>
+
+<p>Mazon's Almanac is an addon for <a href="https://www.curseforge.com/minecraft/mc-mods/book-of-dragons">Book of Dragons</a>. It adds the gear a dragon rider would actually carry: ways to win over wild dragons, treat injured ones, run a stable, and tweak every dragon to your liking.</p>
+
+## Quick start
+
+1. Install NeoForge 21.1 for Minecraft 1.21.1 and Java 21.
+2. Drop Book of Dragons, Fauna Engine, and this mod into your `mods` folder.
+3. Start the game and look for the **Mazon's Almanac** tab in the creative inventory.
+
+## What's in the Almanac
+
+<img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/all-items-blockbench.png" alt="Every item in Mazon's Almanac as an inventory icon" width="100%">
+
+<img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/3d-models-blockbench.png" alt="The 3D models: held, placed and planted" width="100%">
+
+<img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/dragon-root-stages-blockbench.png" alt="The four growth stages of Dragon Root" width="100%">
+
+| | Item | What it does |
+|---|---|---|
+| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/dragon_nip.png" width="48"> | **Dragon Nip** | Calms a wild dragon for five minutes so it's easier to tame. Grow more with Dragon Nip Grass. |
+| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/sagefruit.png" width="48"> | **Sagefruit** | Makes a dragon befriend every dragon within 32 blocks. Grows on sage trees. |
+| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/dragon_treat.png" width="48"> | **Dragon Treat** | Builds loyalty with a dragon you've already tamed. |
+| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/dragon_poultice.png" width="48"> | **Dragon Poultice** | Shortens an injured dragon's recovery time. |
+| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/feeding_trough.png" width="48"> | **Feeding Trough** | Hungry dragons nearby walk over and eat on their own. |
+| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/stable_plate.png" width="48"> | **Stable Plate and Sign** | Link a plate to a Dragon Roost and name your stable. Tamed dragons near the roost stay put. |
+| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/dragon_repellent.png" width="48"> | **Dragon Repellent** | Drink it for 8 minutes of Dragon Scent and wild dragons keep their distance. Also a placeable block. |
+| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/eel.png" width="48"> | **Eel** | A new catch when you fish in rivers and swamps. Dragons are scared of live eels and disgusted by the item. |
+| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/cooked_eel.png" width="48"> | **Cooked Eel** | Cook an Eel in a furnace, smoker, or campfire. Restores as much hunger as cooked cod. |
+| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/dragon_root_seeds.png" width="48"> | **Dragon Root Seeds** | Plant them in dirt or farmland and grow your own Dragon Root. |
+| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/dragon_editor.png" width="48"> | **Dragon Editor** | Creative only. Opens the editor below. |
+| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/sketchbook.png" width="48"> | **Sketchbook** | Edit the colors and markings of a dragon you've tamed. The more it trusts you, the more looks it offers. |
+
+Dragon Root is a plant that grows in four stages. Once it is fully grown it drives off wild dragons within 6 blocks.
+
+## How to get everything
+
+### Crafting
+
+| Item | Recipe |
+|---|---|
+| Dragon Treat (makes 2) | Cooked cod or cooked salmon, wheat, honey bottle (shapeless) |
+| Dragon Poultice | Paper, moss block, honey bottle (shapeless) |
+| Feeding Trough | Wooden slabs across the top and middle, sticks for the legs (`S S` / `SSS` / `L L`) |
+| Stable Plate | Three iron ingots on top, then iron, leather, iron below |
+| Dragon Root Seeds (makes 2) | One Dragon Root |
+| Dragon Repellent | Eel, Dragon Root, glass bottle (shapeless) |
+| Dragon Repellent Block | Two Dragon Repellent and two moss blocks (shapeless) |
+| Dragon Editor | Creative inventory only |
+| Sketchbook | Book, Ink Sac, Feather, and any dragon scale (shapeless) |
+| Cooked Eel | Cook an Eel in a furnace, smoker, or campfire |
+
+### Finding and gathering
+
+| What | Where | How to get it |
+|---|---|---|
+| Dragon Nip | Dragon Nip Grass in plains, sunflower plains, meadows, forests, taigas, and windswept hills and forests. About 1 in 40 chunks has a patch. | Break the grass with any tool, or your bare hand, for 1 to 2 Dragon Nip. Shears give you the grass itself to replant. |
+| Dragon Root | Swamps, mangrove swamps, dark forests, and old growth pine and spruce taigas. About 1 in 40 chunks has a small patch. | Break a fully grown one with anything for Dragon Root. A young one drops seeds. |
+| Dragon Root Seeds | Young Dragon Root, or craft them from a Dragon Root. | Plant them on dirt or farmland. |
+| Sage trees | Forests, flower forests, birch forests, old growth birch forests, and dark forests. Uncommon: about 1 in 40 chunks. | Break the leaves for Sagefruit and saplings. A hoe is the fastest tool. |
+| Sagefruit | Fruiting sage leaves. | Break them without shears or Silk Touch. Those give you the leaf block instead. |
+| Sage Sapling | Sage leaves. | A 5% drop per leaf, up to 10% with Fortune III. |
+| Eel | Rivers, swamps, and mangrove swamps. | About 1 in 8 fish you catch there is an eel. Wild eels also spawn in those biomes, but rarely. Cook one in a furnace, smoker, or campfire for Cooked Eel, which restores as much as cooked cod. |
+
+### Setting things up
+
+- **Feeding Trough:** place it and dragons within 16 blocks come to eat. You can change the range in the config.
+- **Stable Plate:** right-click a Dragon Roost with it to link them, then place it like a sign within 24 blocks of the roost. Tamed dragons in that area keep their stay order. You can change the range in the config.
+- **Dragon Treat and Dragon Poultice:** use them on your own tamed dragon. The poultice takes 60 seconds to work and then cuts an hour off the injury.
+- **Dragon Root Seeds:** plant them on dirt, grass, or farmland in light level 9 or more. The plant grows through four stages and only the last one repels dragons. It grows about two and a half times faster on farmland than on plain dirt, and Bone Meal moves it up a stage.
+- **Chest feeding:** a tamed dragon with a chest starts eating from it when its food drops to 70 out of 100, and keeps eating until it is full or the chest has nothing it will eat. You can change the start level in the config.
+- **Eels and dragons:** every dragon, wild or tamed, backs away from live eels, eel items and buckets of eel, and refuses one if you offer it.
+- **Dragon Nip and Sagefruit:** feed them to a wild dragon or one of your own. Nip calms it for five minutes. Sagefruit makes it befriend every dragon within 32 blocks.
+
+## Sketchbook
+
+Right-click your own tamed dragon with the sketchbook. Opening it consumes one book in survival. You can make as many color and marking changes as you like during that session, and the more your dragon trusts you, the more of its colors and markings it offers. Common ones are always there; uncommon, rare and very rare ones unlock at bond 25, 50 and 90 (out of 100, set in the config). Locked options show the bond they need. Click a row to open the scrollable palette and zoom the live dragon toward the area you're editing. Drag the dragon to turn it, or scroll over it to zoom.
+
+Use the page corners, Left and Right, or scroll over the right-hand page to turn pages. Set `pageFlip` in `bodaddon-client.toml` to `MESH` (default), `SIMPLE`, or `OFF`.
+
+## Dragon Editor
+
+Right-click any dragon with the Dragon Editor to open a work board with a live 3D preview. It has five tabs: **Bond** (loyalty from Wild to Devoted, or instant taming), **Vitals**, **Mind**, **Social** (make every dragon within 32 blocks get along), and **Variants**.
+
+<table>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/editor-vitals.png" alt="Vitals tab: health, injury, and breeding timer"></td>
+    <td><img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/editor-mind.png" alt="Mind tab: personality sliders and trait chart"></td>
+  </tr>
+  <tr>
+    <td align="center" style="text-align:center">Health, injuries, and breeding timer</td>
+    <td align="center" style="text-align:center">Personality sliders with a live trait chart</td>
+  </tr>
+</table>
+
+<img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/editor-variants.png" alt="Variants tab: colors and markings" width="60%">
+
+*Colors and markings*
+
+## Spatial GUI support
+
+If you also have [Spatial GUI](https://www.curseforge.com/minecraft/mc-mods/spatial-gui) 1.x installed, the Almanac fixes its mouse picking while you ride a flying dragon. Spatial GUI normally builds its picking ray from camera yaw and pitch, which doesn't match the dragon flight camera, so menu clicks land in the wrong place. The Almanac uses the exact matrices Spatial GUI rendered the menu with instead. It only applies in flight with a Spatial GUI menu open, and it does nothing if Spatial GUI isn't installed. It's client-side only.
+
+## Requirements
+
+| Requirement | Version |
+|---|---|
+| Minecraft | 1.21.1 |
+| Loader | NeoForge 21.1 or newer |
+| Java | 21 |
+| Book of Dragons | 1.4.2 or newer |
+| Fauna Engine | 1.3 or newer (below 2.0) |
+| Spatial GUI (optional) | 1.x |
+
+## Config options
+
+You can change how far feeding troughs and stable plates reach, the food level at which a dragon starts eating from its chest, and the bond the Sketchbook asks for each rarity. Every species also has editable letter grades for its stats.
+
+## Building from source
+
+The build compiles against the Book of Dragons and Fauna Engine jars, which aren't included here. Put `bookofdragons-1.4.2-1.21.1.jar` and `faunaengine-1.3-1.21.1-neoforge.jar` in a `libs/` folder in the project root. Add `spatial-gui-1.11.0-1.21.1-neoforge.jar` there too, since the Spatial GUI fix compiles against it. Then run:
+
+```bash
+./gradlew build
+```
+
+## License
+
+Released under the [MIT license](https://github.com/Mazon3442/book-of-dragons-mazons-almanac/blob/main/LICENSE).
+
+This is a fan project. It is not affiliated with or endorsed by DreamWorks, Mojang, or the authors of Book of Dragons.

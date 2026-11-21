@@ -35,7 +35,7 @@ write("data/bodaddon/worldgen/configured_feature/sage_tree.json", {"type": "boda
 write("data/bodaddon/worldgen/placed_feature/sage_tree.json", {
     "feature": "bodaddon:sage_tree",
     "placement": [
-        {"type": "minecraft:rarity_filter", "chance": 300},
+        {"type": "minecraft:rarity_filter", "chance": 40},
         {"type": "minecraft:in_square"},
         {"type": "minecraft:surface_water_depth_filter", "max_water_depth": 0},
         {"type": "minecraft:heightmap", "heightmap": "OCEAN_FLOOR"},

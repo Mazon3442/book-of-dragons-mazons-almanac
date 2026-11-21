@@ -69,7 +69,7 @@ Dragon Root is a plant that grows in four stages. Once it is fully grown it driv
 | Dragon Nip | Dragon Nip Grass in plains, sunflower plains, meadows, forests, taigas, and windswept hills and forests. About 1 in 40 chunks has a patch. | Break the grass with any tool, or your bare hand, for 1 to 2 Dragon Nip. Shears give you the grass itself to replant. |
 | Dragon Root | Swamps, mangrove swamps, dark forests, and old growth pine and spruce taigas. About 1 in 40 chunks has a small patch. | Break a fully grown one with anything for Dragon Root. A young one drops seeds. |
 | Dragon Root Seeds | Young Dragon Root, or craft them from a Dragon Root. | Plant them on dirt or farmland. |
-| Sage trees | Forests, flower forests, birch forests, old growth birch forests, and dark forests. Rare: about 1 in 300 chunks. | Break the leaves for Sagefruit and saplings. A hoe is the fastest tool. |
+| Sage trees | Forests, flower forests, birch forests, old growth birch forests, and dark forests. Uncommon: about 1 in 40 chunks. | Break the leaves for Sagefruit and saplings. A hoe is the fastest tool. |
 | Sagefruit | Fruiting sage leaves. | Break them without shears or Silk Touch. Those give you the leaf block instead. |
 | Sage Sapling | Sage leaves. | A 5% drop per leaf, up to 10% with Fortune III. |
 | Eel | Rivers, swamps, and mangrove swamps. | About 1 in 8 fish you catch there is an eel. Wild eels also spawn in those biomes, but rarely. Cook one in a furnace, smoker, or campfire for Cooked Eel, which restores as much as cooked cod. |
@@ -130,7 +130,7 @@ If you also have [Spatial GUI](https://www.curseforge.com/minecraft/mc-mods/spat
 <details>
 <summary>Config options</summary>
 
-You can change how far feeding troughs and stable plates reach. Every species also has editable letter grades for its stats.
+You can change how far feeding troughs and stable plates reach, the food level at which a dragon starts eating from its chest, and the bond the Sketchbook asks for each rarity. Every species also has editable letter grades for its stats.
 
 </details>
 
@@ -142,8 +142,6 @@ The build compiles against the Book of Dragons and Fauna Engine jars, which aren
 ```bash
 ./gradlew build
 ```
-
-The mod jar ends up in `build/libs/`. The pixel art rules are in [DESIGN.md](DESIGN.md), and the scripts that draw the textures are in `tools/`.
 
 </details>
 
