@@ -6,7 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import local.bodaddon.BodAddon;
 import local.bodaddon.BodAddonConfig;
+import net.magister.liberanimalium.genetics.GeneticsSpawner;
+import net.magister.liberanimalium.genetics.config.SpeciesGeneticsConfig;
+import net.magister.liberanimalium.genetics.config.SpeciesGeneticsConfigRegistry;
 import net.magister.bookofdragons.entity.base.dragon.DragonBase;
 import net.magister.liberanimalium.chassis.component.GenotypeComponent;
 import net.magister.liberanimalium.genetics.Locus;
@@ -108,9 +112,26 @@ public final class VariantEdits {
         return true;
     }
 
+    /**
+     * A dragon saved before the engine stored palette draws has a genotype but no draws, so there is nothing to edit
+     * and nothing to save an edit into. Roll draws for it once (server side only; they sync to clients and are saved
+     * with the dragon from then on), keeping its genotype untouched.
+     */
+    private static void ensureDraws(DragonBase d, GenotypeComponent component) {
+        if (component == null || component.getPaletteDraws() != null || !d.hasGenotype() || d.level().isClientSide) return;
+        try {
+            SpeciesGeneticsConfig config = SpeciesGeneticsConfigRegistry.getConfig(d.speciesId());
+            PaletteDraws rolled = new GeneticsSpawner(d.getRandom()).generateWildGenotype(config, d.speciesId()).paletteDraws;
+            d.setGenotypeAndDraws(d.getGenotype(), rolled);
+        } catch (RuntimeException ex) {
+            BodAddon.LOGGER.warn("Could not create palette draws for {}: {}", d, ex.toString());
+        }
+    }
+
     private static List<Row> rowsOf(DragonBase d) {
         List<Row> rows = new ArrayList<>();
         GenotypeComponent component = d.componentRegistry.get(GenotypeComponent.class);
+        ensureDraws(d, component);
         if (component == null || !d.hasGenotype() || component.getPaletteDraws() == null) return rows;
         try {
             PaletteDraws draws = component.getPaletteDraws();

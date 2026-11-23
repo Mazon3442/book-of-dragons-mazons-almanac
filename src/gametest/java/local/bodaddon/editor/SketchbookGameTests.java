@@ -179,6 +179,33 @@ public final class SketchbookGameTests {
         helper.succeed();
     }
 
+    /** A dragon saved before palette draws existed has only a genotype: edit it, save, load, and the edit must remain. */
+    @GameTest(template = "empty")
+    public static void legacyDragonEditsSurviveSavingAndLoading(GameTestHelper helper) {
+        DragonBase original = dragon(helper);
+        net.minecraft.nbt.CompoundTag tag = original.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+        net.minecraft.nbt.CompoundTag genetics = tag.getCompound("Genetics");
+        genetics.remove("PaletteDraws");
+        genetics.remove("Layout");
+
+        DragonBase legacy = ModEntities.TERRIBLE_TERROR.get().create(helper.getLevel());
+        legacy.load(tag);
+        VariantRow[] before = VariantEdits.rows(legacy);
+        for (int i = 0; i < before.length; i++) VariantEdits.set(legacy, i, (before[i].current() + 1) % before[i].options().length);
+        VariantRow[] edited = VariantEdits.rows(legacy);
+
+        DragonBase loaded = ModEntities.TERRIBLE_TERROR.get().create(helper.getLevel());
+        loaded.load(legacy.saveWithoutId(new net.minecraft.nbt.CompoundTag()));
+        VariantRow[] after = VariantEdits.rows(loaded);
+        helper.assertTrue(before.length > 0, "A legacy dragon has no editable rows");
+        helper.assertTrue(after.length == edited.length, "Rows differ after reload: " + edited.length + " vs " + after.length);
+        for (int i = 0; i < edited.length; i++) {
+            helper.assertTrue(after[i].current() == edited[i].current(),
+                "Row " + i + " (" + edited[i].label() + ") changed after saving and loading: " + edited[i].current() + " -> " + after[i].current());
+        }
+        helper.succeed();
+    }
+
     private static DragonBase dragon(GameTestHelper helper) {
         DragonBase dragon = helper.spawnWithNoFreeWill(ModEntities.TERRIBLE_TERROR.get(), 2, 2, 2);
         dragon.finalizeSpawn(helper.getLevel(), helper.getLevel().getCurrentDifficultyAt(dragon.blockPosition()), MobSpawnType.COMMAND, null);
