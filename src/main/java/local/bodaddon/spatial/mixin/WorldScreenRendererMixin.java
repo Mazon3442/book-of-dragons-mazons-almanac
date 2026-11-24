@@ -14,13 +14,15 @@ import org.tastytrash.spatialGUI.render.WorldScreenRenderer;
 @Pseudo
 @Mixin(value = WorldScreenRenderer.class, remap = false)
 public abstract class WorldScreenRendererMixin {
-    @Inject(method = "capturePerspectiveState", at = @At("RETURN"))
+    // Spatial GUI 1.12 renamed these from capturePerspectiveState / resetPerspectiveState;
+    // listing both names keeps 1.0 through 1.12 working.
+    @Inject(method = {"captureCameraState", "capturePerspectiveState"}, at = @At("RETURN"))
     private void dragonSpatial$captureCamera(Matrix4f projection, VertexSorting sorting,
                                              PoseStack view, CallbackInfo ci) {
         FlightPicking.capture(projection, view == null ? new Matrix4f() : view.last().pose());
     }
 
-    @Inject(method = "resetPerspectiveState", at = @At("HEAD"))
+    @Inject(method = {"resetCameraState", "resetPerspectiveState"}, at = @At("HEAD"))
     private void dragonSpatial$resetCamera(CallbackInfo ci) {
         FlightPicking.clear();
     }

@@ -137,7 +137,7 @@ You can change how far feeding troughs and stable plates reach, the food level a
 <details>
 <summary>Building from source</summary>
 
-The build compiles against the Book of Dragons and Fauna Engine jars, which aren't included here. Put `bookofdragons-1.4.2-1.21.1.jar` and `faunaengine-1.3-1.21.1-neoforge.jar` in a `libs/` folder in the project root. Add `spatial-gui-1.11.0-1.21.1-neoforge.jar` there too, since the Spatial GUI fix compiles against it. Then run:
+The build compiles against the Book of Dragons and Fauna Engine jars, which aren't included here. Put `bookofdragons-1.4.2-1.21.1.jar` and `faunaengine-1.3-1.21.1-neoforge.jar` in a `libs/` folder in the project root. Add `spatial-gui-1.12.0-hotfix-1.21.1-neoforge.jar` there too, since the Spatial GUI fix compiles against it. Then run:
 
 ```bash
 ./gradlew build

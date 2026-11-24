@@ -2,6 +2,15 @@
 
 All notable changes to Book of Dragons: Mazon's Almanac. Newest first.
 
+## 0.3.3
+
+### New
+- **Dragon Nip Grass:** Bone Meal now spreads it to nearby open ground.
+- **Tooltips:** Dragon Root Seeds, Eel, Cooked Eel and the Sketchbook now say where they come from and what they do, so the hint shows in JEI, EMI and REI too.
+
+### Fixed
+- **Spatial GUI:** the flight picking fix works again on Spatial GUI 1.12, which renamed two methods the Almanac hooks. It still works on earlier 1.x versions.
+
 ## 0.3.1
 
 ### Changed

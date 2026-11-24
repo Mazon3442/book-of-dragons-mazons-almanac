@@ -176,6 +176,39 @@ public final class DragonNipGameTests {
         helper.succeed();
     }
 
+    @GameTest(template = "empty")
+    public static void boneMealSpreadsNipGrassToOpenGround(GameTestHelper helper) {
+        var level = helper.getLevel();
+        BlockPos pos = helper.absolutePos(new BlockPos(4, 2, 4));
+        for (BlockPos p : BlockPos.betweenClosed(pos.offset(-3, 0, -3), pos.offset(3, 3, 3))) {
+            level.setBlockAndUpdate(p, Blocks.AIR.defaultBlockState());
+        }
+        for (BlockPos p : BlockPos.betweenClosed(pos.offset(-3, -1, -3), pos.offset(3, -1, 3))) {
+            level.setBlockAndUpdate(p, Blocks.GRASS_BLOCK.defaultBlockState());
+        }
+        DoublePlantBlock.placeAt(level, ModBlocks.DRAGON_NIP_GRASS.get().defaultBlockState(), pos, Block.UPDATE_ALL);
+        var grass = ModBlocks.DRAGON_NIP_GRASS.get();
+        // Bone meal on the top half must act on the whole plant.
+        helper.assertTrue(grass.isValidBonemealTarget(level, pos.above(), level.getBlockState(pos.above())),
+            "Nip grass with open ground nearby must accept Bone Meal");
+        grass.performBonemeal(level, RandomSource.create(5), pos.above(), level.getBlockState(pos.above()));
+        long plants = BlockPos.betweenClosedStream(pos.offset(-3, 0, -3), pos.offset(3, 0, 3))
+            .filter(p -> level.getBlockState(p).is(grass)).count();
+        helper.assertTrue(plants >= 2 && plants <= 4, "Bone Meal must plant one to three new nip grass, found " + (plants - 1));
+        helper.assertTrue(BlockPos.betweenClosedStream(pos.offset(-3, 0, -3), pos.offset(3, 0, 3))
+            .filter(p -> level.getBlockState(p).is(grass))
+            .allMatch(p -> level.getBlockState(p.above()).is(grass)), "Every new plant must be two blocks tall");
+
+        for (BlockPos p : BlockPos.betweenClosed(pos.offset(-3, -1, -3), pos.offset(3, -1, 3))) {
+            if (!p.equals(pos.below())) {
+                level.setBlockAndUpdate(p, Blocks.STONE.defaultBlockState());
+            }
+        }
+        helper.assertFalse(grass.isValidBonemealTarget(level, pos, level.getBlockState(pos)),
+            "Bone Meal must not be spent when nothing around can hold nip grass");
+        helper.succeed();
+    }
+
     private static InteractionResult use(ItemStack stack, Player player, DragonBase dragon) {
         return stack.interactLivingEntity(player, dragon, InteractionHand.MAIN_HAND);
     }

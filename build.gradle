@@ -52,7 +52,7 @@ dependencies {
     // Book of Dragons is All Rights Reserved: jars stay local in libs/ and are never bundled.
     compileOnly files('libs/bookofdragons-1.4.2-1.21.1.jar', 'libs/faunaengine-1.3-1.21.1-neoforge.jar')
     // Optional client-side integration. Spatial GUI is another author's mod: local only, never bundled.
-    compileOnly files('libs/spatial-gui-1.11.0-1.21.1-neoforge.jar')
+    compileOnly files('libs/spatial-gui-1.12.0-hotfix-1.21.1-neoforge.jar')
     runtimeOnly files('libs/bookofdragons-1.4.2-1.21.1.jar', 'libs/faunaengine-1.3-1.21.1-neoforge.jar')
     // Test-only: Mob Lassos (and what it needs) so dragons can be picked up and placed in the dev client. Never bundled.
     runtimeOnly files('libs/MobLassos-v21.1.1-1.21.1-NeoForge.jar', 'libs/puzzleslib-v21.1.66-mc1.21.1+neoforge.jar',

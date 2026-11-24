@@ -12,6 +12,7 @@ import local.bodaddon.trough.FeedingTroughBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import local.bodaddon.worldgen.DragonNipGrassBlock;
 import local.bodaddon.worldgen.SageLeavesBlock;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DoubleHighBlockItem;
@@ -20,7 +21,6 @@ import net.minecraft.world.item.ItemNameBlockItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.DoublePlantBlock;
 import net.minecraft.world.level.block.SaplingBlock;
 import net.minecraft.world.level.block.grower.TreeGrower;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -49,9 +49,9 @@ public final class ModBlocks {
     public static final DeferredHolder<Item, BlockItem> SAGE_SAPLING_ITEM = ModItems.ITEMS.register("sage_sapling",
         () -> new BlockItem(SAGE_SAPLING.get(), new Item.Properties()));
 
-    // Same block class as vanilla tall grass; harvesting rules live in its loot table.
-    public static final DeferredHolder<Block, DoublePlantBlock> DRAGON_NIP_GRASS = BLOCKS.register("dragon_nip_grass",
-        () -> new DoublePlantBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.TALL_GRASS)));
+    // Vanilla tall grass behavior plus Bone Meal spreading; harvesting rules live in its loot table.
+    public static final DeferredHolder<Block, DragonNipGrassBlock> DRAGON_NIP_GRASS = BLOCKS.register("dragon_nip_grass",
+        () -> new DragonNipGrassBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.TALL_GRASS)));
     public static final DeferredHolder<Item, DoubleHighBlockItem> DRAGON_NIP_GRASS_ITEM = ModItems.ITEMS.register("dragon_nip_grass",
         () -> new DoubleHighBlockItem(DRAGON_NIP_GRASS.get(), new Item.Properties()));
 
@@ -67,7 +67,7 @@ public final class ModBlocks {
             }
         });
     public static final DeferredHolder<Item, ItemNameBlockItem> DRAGON_ROOT_SEEDS = ModItems.ITEMS.register("dragon_root_seeds",
-        () -> new ItemNameBlockItem(DRAGON_ROOT.get(), new Item.Properties()) {
+        () -> new ItemNameBlockItem(DRAGON_ROOT.get(), ModItems.hint(new Item.Properties(), "item.bodaddon.dragon_root_seeds.hint")) {
             @Override
             protected BlockState getPlacementState(BlockPlaceContext context) {
                 BlockState state = getBlock().defaultBlockState().setValue(DragonRootBlock.AGE, 0);
