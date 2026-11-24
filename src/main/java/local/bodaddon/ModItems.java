@@ -2,6 +2,7 @@ package local.bodaddon;
 
 import local.bodaddon.editor.DragonEditorItem;
 import local.bodaddon.editor.SketchbookItem;
+import local.bodaddon.editor.SketchbookPageItem;
 import local.bodaddon.item.DragonPoulticeItem;
 import local.bodaddon.item.DragonTreatItem;
 import local.bodaddon.item.DragonNipItem;
@@ -41,6 +42,9 @@ public final class ModItems {
 
     public static final DeferredHolder<Item, SketchbookItem> SKETCHBOOK = ITEMS.register("sketchbook",
         () -> new SketchbookItem(hint(new Item.Properties().stacksTo(1), "item.bodaddon.sketchbook.hint1", "item.bodaddon.sketchbook.hint2")));
+
+    public static final DeferredHolder<Item, SketchbookPageItem> SKETCHBOOK_PAGE = ITEMS.register("sketchbook_page",
+        () -> new SketchbookPageItem(new Item.Properties().stacksTo(1)));
 
     public static final DeferredHolder<Item, DragonTreatItem> DRAGON_TREAT = ITEMS.register("dragon_treat",
         () -> new DragonTreatItem(new Item.Properties()));

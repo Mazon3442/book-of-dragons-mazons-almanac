@@ -33,6 +33,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -45,6 +47,8 @@ public class FeedingTroughBlockEntity extends BaseContainerBlockEntity {
     private static final int CHECK_INTERVAL = 40;
     /** Fed until full: a dragon below this food level (of 100) keeps getting meals. */
     private static final int HUNGRY_BELOW = 100;
+
+    private static final int MAX_STATUS_DRAGONS = 8;
 
     private static final int LURE_STEP = 10;
     /** Dragons that have not eaten the lure by now are fed directly: 20 seconds. */
@@ -134,6 +138,39 @@ public class FeedingTroughBlockEntity extends BaseContainerBlockEntity {
             server.playSound(null, dragon.blockPosition(), SoundEvents.GENERIC_EAT, SoundSource.NEUTRAL, 0.35F, 1.0F);
             food.shrink(1);   // eat() applies the meal but leaves the stack to the caller, as the dragon's own feeding does
         }
+    }
+
+    /** What sneak-right-click shows: how full the trough is and how each dragon in reach is doing. */
+    public List<Component> status(ServerLevel server) {
+        List<Component> lines = new ArrayList<>();
+        int used = 0;
+        int count = 0;
+        for (ItemStack stack : items) {
+            if (!stack.isEmpty()) {
+                used++;
+                count += stack.getCount();
+            }
+        }
+        lines.add(Component.translatable("bodaddon.trough.status.store", used, SIZE, count));
+        List<DragonBase> dragons = server.getEntitiesOfClass(DragonBase.class, area(getBlockState()));
+        if (dragons.isEmpty()) {
+            lines.add(Component.translatable("bodaddon.trough.status.none", Math.round(BodAddonConfig.TROUGH_RADIUS.get())));
+            return lines;
+        }
+        lines.add(Component.translatable("bodaddon.trough.status.dragons", dragons.size()));
+        for (int i = 0; i < dragons.size() && i < MAX_STATUS_DRAGONS; i++) {
+            DragonBase dragon = dragons.get(i);
+            FaunaNeedsSystem needs = dragon.getNeedsSystem();
+            if (needs == null) continue;
+            long food = Math.round(needs.getFoodLevel());
+            String key = needs.getFoodLevel() >= HUNGRY_BELOW ? "full"
+                : bestFoodFor(dragon).isEmpty() ? "hungry_nofood" : "hungry_food";
+            lines.add(Component.translatable("bodaddon.trough.status.dragon." + key, dragon.getDisplayName(), food));
+        }
+        if (dragons.size() > MAX_STATUS_DRAGONS) {
+            lines.add(Component.translatable("bodaddon.trough.status.more", dragons.size() - MAX_STATUS_DRAGONS));
+        }
+        return lines;
     }
 
     private static boolean hungry(DragonBase dragon) {

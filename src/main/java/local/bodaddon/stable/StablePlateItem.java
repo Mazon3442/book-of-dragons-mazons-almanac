@@ -91,6 +91,7 @@ public final class StablePlateItem extends BlockItem {
         tooltip.add(Component.translatable("item.bodaddon.stable_plate.desc2", Math.round(BodAddonConfig.STABLE_RADIUS.get()))
             .withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("item.bodaddon.stable_plate.desc3").withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("item.bodaddon.stable_plate.desc4").withStyle(ChatFormatting.GRAY));
         CompoundTag tag = link(stack);
         if (tag.contains(ROOST)) {
             BlockPos pos = BlockPos.of(tag.getLong(ROOST));

@@ -100,7 +100,7 @@ public final class ModBlocks {
         () -> BlockEntityType.Builder.of(FeedingTroughBlockEntity::new, FEEDING_TROUGH.get()).build(null));
 
     public static final DeferredHolder<Item, BlockItem> FEEDING_TROUGH_ITEM = ModItems.ITEMS.register("feeding_trough",
-        () -> new BlockItem(FEEDING_TROUGH.get(), new Item.Properties()));
+        () -> new BlockItem(FEEDING_TROUGH.get(), ModItems.hint(new Item.Properties(), "item.bodaddon.feeding_trough.hint")));
 
     public static void register(IEventBus modBus) {
         BLOCKS.register(modBus);

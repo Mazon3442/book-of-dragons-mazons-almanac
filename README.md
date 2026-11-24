@@ -78,6 +78,7 @@ Dragon Root is a plant that grows in four stages. Once it is fully grown it driv
 
 - **Feeding Trough:** place it and dragons within 16 blocks come to eat. You can change the range in the config.
 - **Stable Plate:** right-click a Dragon Roost with it to link them, then place it like a sign within 24 blocks of the roost. Tamed dragons in that area keep their stay order. You can change the range in the config.
+- **Status:** sneak and right-click a Feeding Trough or a Stable Sign with an empty hand to see who is in reach, who is hungry, how full the trough is, and how the stable is holding its dragons. A normal right-click still opens the chest or the name box.
 - **Dragon Treat and Dragon Poultice:** use them on your own tamed dragon. The poultice takes 60 seconds to work and then cuts an hour off the injury.
 - **Dragon Root Seeds:** plant them on dirt, grass, or farmland in light level 9 or more. The plant grows through four stages and only the last one repels dragons. It grows about two and a half times faster on farmland than on plain dirt, and Bone Meal moves it up a stage.
 - **Chest feeding:** a tamed dragon with a chest starts eating from it when its food drops to 70 out of 100, and keeps eating until it is full or the chest has nothing it will eat. You can change the start level in the config.
@@ -89,6 +90,8 @@ Dragon Root is a plant that grows in four stages. Once it is fully grown it driv
 ## Sketchbook
 
 Right-click your own tamed dragon with the sketchbook. Opening it consumes one book in survival. You can make as many color and marking changes as you like during that session, and the more your dragon trusts you, the more of its colors and markings it offers. Common ones are always there; uncommon, rare and very rare ones unlock at bond 25, 50 and 90 (out of 100, set in the config). Locked options show the bond they need. Click a row to open the scrollable palette and zoom the live dragon toward the area you're editing. Drag the dragon to turn it, or scroll over it to zoom.
+
+The page also shows the dragon's bond and what it needs for the next unlock, for example "Bond 42 / 50 for rare". **Undo** puts the dragon back to how it looked when you opened the book. **Save** gives you a Sketchbook Page with the dragon's current look, and **Paste** applies a page you're carrying to a dragon of the same kind. Looks the dragon hasn't earned the bond for are skipped, and the page isn't used up.
 
 Use the page corners, Left and Right, or scroll over the right-hand page to turn pages. Set `pageFlip` in `bodaddon-client.toml` to `MESH` (default), `SIMPLE`, or `OFF`.
 

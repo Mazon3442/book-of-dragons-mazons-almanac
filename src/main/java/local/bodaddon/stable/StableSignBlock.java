@@ -140,8 +140,13 @@ public final class StableSignBlock extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide) return InteractionResult.SUCCESS;
-        if (player instanceof ServerPlayer sp && level.getBlockEntity(pos) instanceof StableSignBlockEntity sign) {
-            StablePayloads.sendOpen(sp, pos, sign.name());
+        if (player instanceof ServerPlayer sp && level instanceof ServerLevel server
+                && level.getBlockEntity(pos) instanceof StableSignBlockEntity sign) {
+            if (player.isShiftKeyDown()) {
+                StableEvents.status(server, pos, sign.name()).forEach(line -> player.displayClientMessage(line, false));
+            } else {
+                StablePayloads.sendOpen(sp, pos, sign.name());
+            }
         }
         return InteractionResult.CONSUME;
     }

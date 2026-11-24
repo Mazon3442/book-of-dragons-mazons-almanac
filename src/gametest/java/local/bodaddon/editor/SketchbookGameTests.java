@@ -206,6 +206,140 @@ public final class SketchbookGameTests {
         helper.succeed();
     }
 
+    @GameTest(template = "empty")
+    public static void pageReportsBondAndTheNextUnlock(GameTestHelper helper) {
+        DragonBase dragon = dragon(helper);
+        ServerPlayer owner = player(helper, dragon);
+        dragon.adopt(owner.getUUID());
+        DragonEdits.setBond(dragon, owner.getUUID(), 420);
+        holdBook(owner);
+        var open = SketchbookSessions.open(owner, dragon, InteractionHand.OFF_HAND);
+        helper.assertTrue(open.bond() == 42, "Bond is sent on the 0 to 100 scale: " + open.bond());
+        helper.assertTrue(open.nextNeed() > 42 && open.nextNeed() == VariantEdits.nextUnlock(open.rows()),
+            "The next unlock is the smallest bond still missing: " + open.nextNeed());
+        helper.assertTrue(open.nextTier() >= 1 && open.nextTier() <= 3, "The next unlock names its rarity tier: " + open.nextTier());
+        dragon.setBond(owner.getUUID(), 1000);
+        holdBook(owner);
+        var full = SketchbookSessions.open(owner, dragon, InteractionHand.OFF_HAND);
+        helper.assertTrue(full.bond() == 100 && full.nextNeed() == 0, "A fully bonded dragon has nothing left to unlock");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void revertPutsBackTheLookFromWhenTheBookOpened(GameTestHelper helper) {
+        DragonBase dragon = dragon(helper);
+        ServerPlayer owner = player(helper, dragon);
+        dragon.adopt(owner.getUUID());
+        dragon.setBond(owner.getUUID(), 1000);
+        holdBook(owner);
+        var open = SketchbookSessions.open(owner, dragon, InteractionHand.OFF_HAND);
+        int[] opening = new int[open.rows().length];
+        for (int i = 0; i < opening.length; i++) opening[i] = open.rows()[i].current();
+        VariantRow row = open.rows()[0];
+        int other = (row.current() + 1) % row.options().length;
+        var changed = SketchbookSessions.change(owner, new EditorPayloads.SketchbookChoice(open.token(), row.locus(), row.slot(),
+            ResourceLocation.parse(row.ids()[other])));
+        helper.assertTrue(changed.rows()[0].current() == other, "The edit must apply before it can be reverted");
+
+        helper.assertTrue(SketchbookSessions.revert(owner, UUID.randomUUID()) == null, "A forged token must not revert anything");
+        var back = SketchbookSessions.revert(owner, open.token());
+        for (int i = 0; i < opening.length; i++) {
+            helper.assertTrue(back.rows()[i].current() == opening[i], "Row " + i + " must go back to how it was when the book opened");
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void savedPageCanBePastedOntoAnotherDragonOfTheSameKind(GameTestHelper helper) {
+        DragonBase source = dragon(helper);
+        DragonBase target = dragon(helper);
+        ServerPlayer owner = player(helper, source);
+        capturePackets(owner, new ArrayList<>());
+        source.adopt(owner.getUUID());
+        target.adopt(owner.getUUID());
+        source.setBond(owner.getUUID(), 1000);
+        target.setBond(owner.getUUID(), 1000);
+        holdBook(owner);
+        var open = SketchbookSessions.open(owner, source, InteractionHand.OFF_HAND);
+        VariantRow row = open.rows()[0];
+        int shown = (row.current() + 1) % row.options().length;
+        SketchbookSessions.change(owner, new EditorPayloads.SketchbookChoice(open.token(), row.locus(), row.slot(), ResourceLocation.parse(row.ids()[shown])));
+
+        SketchbookSessions.saveLook(owner, UUID.randomUUID());
+        helper.assertTrue(pageCount(owner) == 0, "A forged token must not hand out a page");
+        SketchbookSessions.saveLook(owner, open.token());
+        ItemStack page = ItemStack.EMPTY;
+        int pageSlot = -1;
+        for (int i = 0; i < owner.getInventory().getContainerSize(); i++) {
+            if (owner.getInventory().getItem(i).is(ModItems.SKETCHBOOK_PAGE.get())) {
+                page = owner.getInventory().getItem(i);
+                pageSlot = i;
+            }
+        }
+        helper.assertTrue(!page.isEmpty() && SketchbookPageItem.species(page).equals(source.speciesId()), "Saving must give a page of the dragon's kind");
+        SketchbookSessions.close(owner, open.token());
+
+        // Put the target on a different look than the page, then paste.
+        VariantRow targetRow = VariantEdits.rows(target)[0];
+        int different = (shown + 1) % targetRow.options().length;
+        VariantEdits.set(target, 0, different);
+        holdBook(owner);
+        var second = SketchbookSessions.open(owner, target, InteractionHand.OFF_HAND);
+        helper.assertTrue(SketchbookSessions.paste(owner, UUID.randomUUID(), pageSlot) == null, "A forged token must not paste");
+        helper.assertTrue(SketchbookSessions.paste(owner, second.token(), -1) == null, "A slot outside the inventory must not paste");
+        var pasted = SketchbookSessions.paste(owner, second.token(), pageSlot);
+        helper.assertTrue(pasted != null && pasted.rows()[0].ids()[pasted.rows()[0].current()].equals(row.ids()[shown]),
+            "The pasted look must show on the other dragon");
+        helper.assertTrue(pageCount(owner) == 1, "The page is kept after pasting");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void pasteSkipsLooksTheBondHasNotUnlockedAndIgnoresOtherKinds(GameTestHelper helper) {
+        DragonBase dragon = dragon(helper);
+        ServerPlayer owner = player(helper, dragon);
+        capturePackets(owner, new ArrayList<>());
+        dragon.adopt(owner.getUUID());
+        DragonEdits.setBond(dragon, owner.getUUID(), 0);
+        VariantRow locked = null;
+        int lockedOption = -1;
+        for (VariantRow row : VariantEdits.rows(dragon, 0)) {
+            for (int i = 0; i < row.bondNeeded().length && locked == null; i++) {
+                if (row.bondNeeded()[i] > 0) {
+                    locked = row;
+                    lockedOption = i;
+                }
+            }
+        }
+        helper.assertTrue(locked != null, "An unbonded dragon must have a locked look");
+        var look = List.of(new VariantEdits.Look(locked.locus(), locked.slot(), ResourceLocation.parse(locked.ids()[lockedOption])));
+        int[] result = VariantEdits.paste(dragon, look, 0);
+        helper.assertTrue(result[0] == 0 && result[1] == 1, "A look the bond has not unlocked is counted, not applied");
+        for (VariantRow row : VariantEdits.rows(dragon, 0)) {
+            if (row.locus().equals(locked.locus()) && row.slot() == locked.slot()) {
+                helper.assertTrue(row.current() == locked.current(), "The locked look must not have been applied");
+            }
+        }
+
+        holdBook(owner);
+        var open = SketchbookSessions.open(owner, dragon, InteractionHand.OFF_HAND);
+        owner.getInventory().add(SketchbookPageItem.create(ModItems.SKETCHBOOK_PAGE.get(), "not_this_kind", "Elsewhere", look));
+        int foreign = -1;
+        for (int i = 0; i < owner.getInventory().getContainerSize(); i++) {
+            if (owner.getInventory().getItem(i).is(ModItems.SKETCHBOOK_PAGE.get())) foreign = i;
+        }
+        helper.assertTrue(SketchbookSessions.paste(owner, open.token(), foreign) == null, "A page of another kind of dragon must be ignored");
+        helper.succeed();
+    }
+
+    private static int pageCount(ServerPlayer player) {
+        int n = 0;
+        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+            if (player.getInventory().getItem(i).is(ModItems.SKETCHBOOK_PAGE.get())) n++;
+        }
+        return n;
+    }
+
     private static DragonBase dragon(GameTestHelper helper) {
         DragonBase dragon = helper.spawnWithNoFreeWill(ModEntities.TERRIBLE_TERROR.get(), 2, 2, 2);
         dragon.finalizeSpawn(helper.getLevel(), helper.getLevel().getCurrentDifficultyAt(dragon.blockPosition()), MobSpawnType.COMMAND, null);

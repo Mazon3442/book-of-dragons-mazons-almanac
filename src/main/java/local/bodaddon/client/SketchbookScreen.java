@@ -10,7 +10,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import local.bodaddon.BodAddon;
 import local.bodaddon.editor.EditorPayloads.SketchbookChoice;
 import local.bodaddon.editor.EditorPayloads.SketchbookClose;
+import local.bodaddon.editor.EditorPayloads.SketchbookPaste;
+import local.bodaddon.editor.EditorPayloads.SketchbookRevert;
+import local.bodaddon.editor.EditorPayloads.SketchbookSaveLook;
 import local.bodaddon.editor.EditorPayloads.SketchbookPage;
+import local.bodaddon.editor.SketchbookPageItem;
 import local.bodaddon.editor.VariantRow;
 import net.magister.bookofdragons.entity.base.dragon.DragonBase;
 import net.minecraft.Util;
@@ -44,6 +48,7 @@ final class SketchbookScreen extends Screen {
     private static final VariantsPanel.Skin PAPER = VariantsPanel.Skin.PAPER;
     private static final ResourceLocation BOOK = art("book_open");
     private static final ResourceLocation SHEET = art("page_blank");
+    private static final ResourceLocation BOOKMARK = art("bookmark");
     private static final int MAX_TURNING_PAGES = 4;
     private static final int SHEET_STAGGER_MS = 80;
 
@@ -52,6 +57,8 @@ final class SketchbookScreen extends Screen {
     private final Deque<Integer> queuedTurns = new ArrayDeque<>();
     private SketchbookPage state;
     private VariantsPanel.OptionList options;
+    private List<SavedLook> saved = List.of();
+    private boolean saves;
     private boolean draggingDragon;
     private int left, top;
     private int page;
@@ -84,6 +91,16 @@ final class SketchbookScreen extends Screen {
             VariantRow row = variants.shown[variants.pickerRow];
             options = addRenderableWidget(variants.new OptionList(font, PAPER, x, y, ROW_W, row, index -> choose(row, index)));
             addRenderableWidget(new InkButton(x + 67, y - 17, 31, 13, PAPER.text(Component.translatable("gui.back")), this::closePicker));
+        } else if (saves) {
+            saved = carriedPages();
+            for (int i = 0; i < Math.min(saved.size(), ROWS_PER_PAGE); i++) {
+                SavedLook look = saved.get(i);
+                addWidget(new InkButton(x, y + i * ROW_STEP, ROW_W, ROW_STEP,
+                    Component.translatable("bodaddon.sketchbook.saves.row", look.name()),
+                    () -> PacketDistributor.sendToServer(new SketchbookPaste(state.token(), look.slot()))));
+            }
+            addLookButtons();
+            addRenderableWidget(new Bookmark(left + BOOK_W - 15, top + 22));
         } else {
             for (int i = 0; i < ROWS_PER_PAGE; i++) {
                 int index = page * ROWS_PER_PAGE + i;
@@ -98,7 +115,52 @@ final class SketchbookScreen extends Screen {
                 addPageCorner(left + 16, -1, "‹", "bodaddon.sketchbook.previous");
                 addPageCorner(left + 226, 1, "›", "bodaddon.sketchbook.next");
             }
+            addLookButtons();
+            addRenderableWidget(new Bookmark(left + BOOK_W - 15, top + 22));
         }
+    }
+
+    /** Undo and Save along the bottom of the portrait page, clear of the page corner. */
+    private void addLookButtons() {
+        int gap = 8;
+        int undo = font.width(PAPER.text(Component.translatable("bodaddon.sketchbook.revert"))) + 4;
+        int save = font.width(PAPER.text(Component.translatable("bodaddon.sketchbook.save"))) + 4;
+        int x = left + 70 - (undo + gap + save) / 2;
+        int y = top + 140;
+        x = addLookButton(x, y, "bodaddon.sketchbook.revert", "bodaddon.sketchbook.revert.narration",
+            () -> PacketDistributor.sendToServer(new SketchbookRevert(state.token())), true);
+        addLookButton(x - 4 + gap, y, "bodaddon.sketchbook.save", "bodaddon.sketchbook.save.narration",
+            () -> PacketDistributor.sendToServer(new SketchbookSaveLook(state.token())), true);
+    }
+
+    private void toggleSaves() {
+        if (!flying.isEmpty()) return;
+        saves = !saves;
+        rebuildWidgets();
+    }
+
+    /** Sketchbook Pages of this dragon's species in the inventory, as slot and the name they were saved from. */
+    private List<SavedLook> carriedPages() {
+        List<SavedLook> found = new ArrayList<>();
+        DragonBase target = dragon();
+        if (target == null || minecraft == null || minecraft.player == null) return found;
+        var inventory = minecraft.player.getInventory();
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            var stack = inventory.getItem(i);
+            if (SketchbookPageItem.species(stack).equals(target.speciesId())) {
+                found.add(new SavedLook(i, SketchbookPageItem.dragonName(stack)));
+            }
+        }
+        return found;
+    }
+
+    private int addLookButton(int x, int y, String label, String narration, Runnable action, boolean enabled) {
+        Component text = PAPER.text(Component.translatable(label));
+        int width = font.width(text) + 4;
+        InkButton button = addRenderableWidget(new InkButton(x, y, width, 10, Component.translatable(narration), action));
+        button.visibleText = text;
+        button.active = enabled;
+        return x + width + 4;
     }
 
     private void addPageCorner(int x, int delta, String glyph, String narration) {
@@ -156,7 +218,7 @@ final class SketchbookScreen extends Screen {
     }
 
     private void requestTurn(int delta) {
-        if (options != null) return;
+        if (options != null || saves) return;
         int destination = page;
         for (int pending : queuedTurns) destination += pending;
         if (destination + delta < 0 || destination + delta >= variants.pages()) return;
@@ -236,6 +298,12 @@ final class SketchbookScreen extends Screen {
         g.drawString(font, title, bookX + 70 - font.width(title) / 2, bookY + 16, PAPER.ink, false);
         var name = PAPER.fit(font, Component.literal(state.name()), 101);
         g.drawString(font, name, bookX + 70 - font.width(name) / 2, bookY + 37, PAPER.secondary, false);
+        Component bond = state.nextNeed() > 0
+            ? Component.translatable("bodaddon.sketchbook.bond_next", state.bond(), state.nextNeed(),
+                Component.translatable("bodaddon.sketchbook.tier." + state.nextTier()))
+            : Component.translatable("bodaddon.sketchbook.bond", state.bond());
+        var bondLine = PAPER.fit(font, PAPER.text(bond), 101);
+        g.drawString(font, bondLine, bookX + 70 - font.width(bondLine) / 2, bookY + 26, PAPER.secondary, false);
         DragonBase target = dragon();
         if (target != null) drawPortraitDragon(g, target, bookX, bookY, targetHeight);
     }
@@ -290,7 +358,7 @@ final class SketchbookScreen extends Screen {
         drawBlankSheet(g, x, y);
         boolean picking = live && options != null;
         Component heading = picking ? Component.literal(variants.shown[variants.pickerRow].label())
-            : Component.translatable("bodaddon.sketchbook.heading");
+            : Component.translatable(saves ? "bodaddon.sketchbook.saves" : "bodaddon.sketchbook.heading");
         if (picking) {
             g.drawString(font, PAPER.fit(font, heading, 64), x + ROW_X, y + 11, PAPER.ink, false);
         } else {
@@ -298,6 +366,10 @@ final class SketchbookScreen extends Screen {
             g.drawString(font, title, x + (SHEET_W - font.width(title)) / 2, y + 8, PAPER.ink, false);
         }
         if (picking) return;
+        if (saves) {
+            drawSaves(g, x, y, mx, my, live);
+            return;
+        }
         if (variants.shown.length == 0) {
             g.drawWordWrap(font, PAPER.text(Component.translatable("bodaddon.sketchbook.no_variants")), x + ROW_X, y + ROW_Y, ROW_W, PAPER.secondary);
         }
@@ -313,6 +385,25 @@ final class SketchbookScreen extends Screen {
         if (variants.pages() > 1) {
             Component number = PAPER.text(Component.translatable("bodaddon.sketchbook.page", sheetPage + 1, variants.pages()));
             g.drawString(font, number, x + (SHEET_W - font.width(number)) / 2, y + 134, PAPER.secondary, false);
+        }
+    }
+
+    private void drawSaves(GuiGraphics g, int x, int y, int mx, int my, boolean live) {
+        if (saved.isEmpty()) {
+            g.drawWordWrap(font, PAPER.text(Component.translatable("bodaddon.sketchbook.saves.none")), x + ROW_X, y + ROW_Y, ROW_W, PAPER.secondary);
+            return;
+        }
+        for (int i = 0; i < Math.min(saved.size(), ROWS_PER_PAGE); i++) {
+            int rx = x + ROW_X;
+            int ry = y + ROW_Y + i * ROW_STEP;
+            boolean hot = live && ((mx >= rx && mx < rx + ROW_W && my >= ry && my < ry + ROW_STEP)
+                || (i < children().size() && children().get(i).isFocused()));
+            int accent = hot ? PAPER.accent : PAPER.secondary;
+            String name = saved.get(i).name().isEmpty() ? "?" : saved.get(i).name();
+            g.drawString(font, PAPER.fit(font, Component.literal(name), ROW_W), rx, ry, PAPER.ink, false);
+            g.drawString(font, PAPER.fit(font, PAPER.text(Component.translatable("bodaddon.sketchbook.paste")), ROW_W - 10), rx, ry + 9, accent, false);
+            g.drawString(font, "›", rx + ROW_W - 5, ry + 9, accent, false);
+            if (hot) g.fill(rx, ry + 18, rx + ROW_W, ry + 19, PAPER.accent);
         }
     }
 
@@ -368,7 +459,7 @@ final class SketchbookScreen extends Screen {
             variants.zoom(sy);
             return true;
         }
-        if (options == null && mx >= left + SHEET_X && mx < left + SHEET_X + SHEET_W && my >= top && my < top + BOOK_H) {
+        if (options == null && !saves && mx >= left + SHEET_X && mx < left + SHEET_X + SHEET_W && my >= top && my < top + BOOK_H) {
             requestTurn(sy > 0 ? -1 : 1);
             return true;
         }
@@ -379,6 +470,10 @@ final class SketchbookScreen extends Screen {
     public boolean keyPressed(int key, int scan, int modifiers) {
         if (options != null && key == GLFW.GLFW_KEY_ESCAPE) {
             closePicker();
+            return true;
+        }
+        if (saves && key == GLFW.GLFW_KEY_ESCAPE) {
+            toggleSaves();
             return true;
         }
         if (options == null && (key == GLFW.GLFW_KEY_LEFT || key == GLFW.GLFW_KEY_RIGHT)) {
@@ -434,6 +529,33 @@ final class SketchbookScreen extends Screen {
             float t = fraction(now);
             duration = Math.max(220, duration - 65);
             start = now - Math.round(t * duration);
+        }
+    }
+
+    private record SavedLook(int slot, String name) {}
+
+    /** A ribbon marker on the book's right edge that turns to the saved looks and back. */
+    private final class Bookmark extends AbstractButton {
+        Bookmark(int x, int y) {
+            super(x, y, 24, 8, Component.translatable("bodaddon.sketchbook.bookmark"));
+        }
+
+        @Override public void onPress() { toggleSaves(); }
+        @Override protected void updateWidgetNarration(NarrationElementOutput out) { defaultButtonNarrationText(out); }
+
+        /** The 32x13 texture has clear margin around the 22x6 ribbon, so it draws offset from the hit box. */
+        @Override
+        protected void renderWidget(GuiGraphics g, int mx, int my, float partial) {
+            int x = getX() - 4 + (saves ? 3 : 0);
+            int y = getY() - 3;
+            boolean blend = GL11.glIsEnabled(GL11.GL_BLEND);
+            RenderSystem.enableBlend();
+            try {
+                g.blit(BOOKMARK, x, y, 0, 0, 32, 13, 32, 13);
+            } finally {
+                if (!blend) RenderSystem.disableBlend();
+            }
+            if (isFocused()) g.fill(x + 5, y + 10, x + 27, y + 11, PAPER.accent);
         }
     }
 

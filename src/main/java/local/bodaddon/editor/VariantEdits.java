@@ -34,6 +34,9 @@ public final class VariantEdits {
 
     private record Row(Locus locus, int slot, int slots, List<ResourceLocation> options, int current) {}
 
+    /** The palette showing on one row: what a Sketchbook Page stores and what Revert puts back. */
+    public record Look(String locus, int slot, ResourceLocation palette) {}
+
     private VariantEdits() {}
 
     /** Every row, all options free: the creative editor. */
@@ -77,6 +80,59 @@ public final class VariantEdits {
             }
         }
         return 0;
+    }
+
+    /** The smallest bond (0 to 100) that would unlock something, or 0 when nothing in these rows is locked. */
+    public static int nextUnlock(VariantRow[] rows) {
+        int next = 0;
+        for (VariantRow row : rows) {
+            for (int need : row.bondNeeded()) {
+                if (need > 0 && (next == 0 || need < next)) next = need;
+            }
+        }
+        return next;
+    }
+
+    /** Which rarity tier (1 uncommon, 2 rare, 3 very rare) asks for exactly this bond, or 0. */
+    public static int tierFor(int need) {
+        for (int tier = 1; tier <= 3; tier++) {
+            if (BodAddonConfig.sketchbookBond(tier) == need) return tier;
+        }
+        return 0;
+    }
+
+    /** Every row's showing palette. */
+    public static List<Look> snapshot(DragonBase d) {
+        List<Look> looks = new ArrayList<>();
+        for (Row row : rowsOf(d)) looks.add(new Look(row.locus().name(), row.slot(), row.options().get(row.current())));
+        return looks;
+    }
+
+    /** Puts earlier looks back whatever the bond is: the dragon was already wearing them. */
+    static void restore(DragonBase d, List<Look> looks) {
+        for (Look look : looks) {
+            for (Row row : rowsOf(d)) {
+                if (matches(row, look) && !row.options().get(row.current()).equals(look.palette())) apply(d, row, look.palette());
+            }
+        }
+    }
+
+    /** Applies a saved look. Parts the bond has not unlocked are counted instead of applied. Returns {applied, locked}. */
+    static int[] paste(DragonBase d, List<Look> looks, int bond) {
+        int applied = 0;
+        int locked = 0;
+        for (Look look : looks) {
+            for (Row row : rowsOf(d)) {
+                if (!matches(row, look) || row.options().get(row.current()).equals(look.palette())) continue;
+                if (bondNeeded(d.speciesId(), row, bond)[row.options().indexOf(look.palette())] > 0) locked++;
+                else if (apply(d, row, look.palette())) applied++;
+            }
+        }
+        return new int[] {applied, locked};
+    }
+
+    private static boolean matches(Row row, Look look) {
+        return row.locus().name().equals(look.locus()) && row.slot() == look.slot() && row.options().contains(look.palette());
     }
 
     public static void set(DragonBase d, int rowIndex, int option) {

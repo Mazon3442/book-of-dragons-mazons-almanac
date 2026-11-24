@@ -1,12 +1,17 @@
 package local.bodaddon.stable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import local.bodaddon.BodAddonConfig;
 import net.magister.bookofdragons.entity.base.dragon.DragonBase;
 import net.magister.liberanimalium.fauna.core.FaunaMind;
 import net.magister.liberanimalium.roost.RoostBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
@@ -51,6 +56,40 @@ public final class StableEvents {
             data.remove(HELD_KEY);
             data.remove(RESTING_KEY);
         }
+    }
+
+    /** What sneak-right-click on a Stable Sign shows: the link, and how the tamed dragons around the roost are being held. */
+    public static List<Component> status(ServerLevel level, BlockPos signPos, String stableName) {
+        List<Component> lines = new ArrayList<>();
+        lines.add(stableName.isEmpty() ? Component.translatable("bodaddon.stable.status.unnamed")
+            : Component.translatable("bodaddon.stable.status.name", stableName));
+        BlockPos roost = PlateData.get(level).roostOf(signPos);
+        if (roost == null) {
+            lines.add(Component.translatable("bodaddon.stable.status.unlinked"));
+            return lines;
+        }
+        double radius = BodAddonConfig.STABLE_RADIUS.get();
+        if (level.isLoaded(roost) && !(level.getBlockState(roost).getBlock() instanceof RoostBlock)) {
+            lines.add(Component.translatable("bodaddon.stable.status.missing"));
+            return lines;
+        }
+        lines.add(Component.translatable("bodaddon.stable.status.roost", roost.getX(), roost.getY(), roost.getZ(),
+            Math.round(Math.sqrt(signPos.distSqr(roost))), Math.round(radius)));
+        if (signPos.getCenter().distanceToSqr(roost.getCenter()) > radius * radius) {
+            lines.add(Component.translatable("bodaddon.stable.status.far"));
+            return lines;
+        }
+        int listed = 0;
+        for (DragonBase dragon : level.getEntitiesOfClass(DragonBase.class, new AABB(roost).inflate(radius))) {
+            if (!dragon.isTame() || dragon.position().distanceToSqr(roost.getCenter()) > radius * radius) continue;
+            CompoundTag data = dragon.getPersistentData();
+            boolean hurt = data.contains(HURT_KEY) && level.getGameTime() - data.getLong(HURT_KEY) <= HURT_WINDOW;
+            String key = hurt ? "hurt" : data.getBoolean(RESTING_KEY) ? "resting" : "held";
+            lines.add(Component.translatable("bodaddon.stable.status.dragon." + key, dragon.getDisplayName()));
+            listed++;
+        }
+        if (listed == 0) lines.add(Component.translatable("bodaddon.stable.status.none", Math.round(radius)));
+        return lines;
     }
 
     @SubscribeEvent

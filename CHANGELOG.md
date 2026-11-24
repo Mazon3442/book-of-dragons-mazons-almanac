@@ -2,6 +2,17 @@
 
 All notable changes to Book of Dragons: Mazon's Almanac. Newest first.
 
+## 0.4.0
+
+### New
+- **Sketchbook bond:** the book now shows the dragon's bond and what it needs for the next unlock, for example "Bond 42 / 50 for rare".
+- **Sketchbook Page:** press Save in the Sketchbook to get a page holding the dragon's colors and markings. Press Paste in the book of another dragon of the same kind to apply a page you're carrying. Looks that dragon hasn't earned the bond for are skipped, and the page isn't used up.
+- **Undo:** puts the dragon back to how it looked when you opened the book.
+- **Status:** sneak and right-click a Feeding Trough or a Stable Sign with an empty hand to see who is in reach, who is hungry, how full the trough is, and how the stable is holding its dragons.
+
+### Changed
+- The Sketchbook network protocol changed, so the client and server both need 0.4.0.
+
 ## 0.3.3
 
 ### New

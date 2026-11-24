@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import local.bodaddon.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -120,7 +121,13 @@ public class FeedingTroughBlock extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide && level.getBlockEntity(footPos(state, pos)) instanceof FeedingTroughBlockEntity trough) player.openMenu(trough);
+        if (!level.isClientSide && level.getBlockEntity(footPos(state, pos)) instanceof FeedingTroughBlockEntity trough) {
+            if (player.isShiftKeyDown() && level instanceof ServerLevel server) {
+                trough.status(server).forEach(line -> player.displayClientMessage(line, false));
+            } else {
+                player.openMenu(trough);
+            }
+        }
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 

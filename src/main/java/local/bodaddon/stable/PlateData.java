@@ -47,6 +47,11 @@ public final class PlateData extends SavedData {
         setDirty();
     }
 
+    /** The roost this sign was linked to, or null if it is not a known sign. */
+    public BlockPos roostOf(BlockPos sign) {
+        return signs.containsKey(sign.asLong()) ? BlockPos.of(signs.get(sign.asLong())) : null;
+    }
+
     public void removeSign(BlockPos sign) {
         if (signs.containsKey(sign.asLong())) {
             signs.remove(sign.asLong());
