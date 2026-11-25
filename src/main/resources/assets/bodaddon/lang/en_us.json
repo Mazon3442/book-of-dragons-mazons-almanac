@@ -131,6 +131,8 @@
   "bodaddon.configuration.dragon_feeding.start": "Start eating at",
   "bodaddon.configuration.dragon_feeding.start.tooltip": "A tamed dragon with a chest starts eating from it when its food drops to this level (of 100), then keeps eating until it is full or the chest has nothing it will eat.",
   "bodaddon.configuration.sketchbook": "Sketchbook",
+  "bodaddon.configuration.sketchbook.require_bond": "Rarer looks need bond",
+  "bodaddon.configuration.sketchbook.require_bond.tooltip": "Lock uncommon, rare and very rare colors and markings behind bond. Turn off to let owners pick any look straight away.",
   "bodaddon.configuration.sketchbook.uncommon": "Bond for uncommon looks",
   "bodaddon.configuration.sketchbook.uncommon.tooltip": "Bond (0 to 100) a dragon needs before the Sketchbook offers its uncommon colors and markings. Common ones are always offered.",
   "bodaddon.configuration.sketchbook.rare": "Bond for rare looks",

@@ -2,6 +2,11 @@
 
 All notable changes to Book of Dragons: Mazon's Almanac. Newest first.
 
+## 0.4.2
+
+### New
+- **Config:** "Rarer looks need bond" (`require_bond` under `sketchbook`). Turn it off to let owners pick any color or marking in the Sketchbook straight away, whatever their dragon's bond. Paste then applies every part of a saved page too. It is on by default, so nothing changes unless you turn it off. On a server, the server's setting decides.
+
 ## 0.4.1
 
 A fix release for tamed dragons that ignored their owner, stood around, got exhausted or turned hostile. Update as soon as you can. Dragons that were affected recover on their own once they have slept and eaten.

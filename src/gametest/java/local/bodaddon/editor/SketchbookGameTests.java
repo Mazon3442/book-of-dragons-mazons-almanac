@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.mojang.authlib.GameProfile;
+import local.bodaddon.BodAddonConfig;
 import local.bodaddon.ModItems;
 import net.magister.bookofdragons.entity.ModEntities;
 import net.magister.bookofdragons.entity.base.dragon.DragonBase;
@@ -105,6 +106,46 @@ public final class SketchbookGameTests {
         helper.assertTrue(after != null, "A fully bonded dragon must accept every look");
         for (VariantRow row : after.rows()) {
             for (int need : row.bondNeeded()) helper.assertTrue(need == 0, "Nothing stays locked at full bond");
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void turningOffTheBondLockUnlocksEveryLook(GameTestHelper helper) {
+        DragonBase dragon = dragon(helper);
+        ServerPlayer owner = player(helper, dragon);
+        dragon.adopt(owner.getUUID());
+        DragonEdits.setBond(dragon, owner.getUUID(), 0);
+        VariantRow[] withLock = VariantEdits.rows(dragon, 0);
+        int lockedRow = -1, lockedOption = -1;
+        for (int r = 0; r < withLock.length && lockedRow < 0; r++) {
+            for (int i = 0; i < withLock[r].bondNeeded().length; i++) {
+                if (withLock[r].bondNeeded()[i] > 0) {
+                    lockedRow = r;
+                    lockedOption = i;
+                    break;
+                }
+            }
+        }
+        helper.assertTrue(lockedRow >= 0, "With the lock on, an unbonded dragon has locked looks");
+        BodAddonConfig.SKETCHBOOK_REQUIRE_BOND.set(false);
+        try {
+            holdBook(owner);
+            List<Packet<?>> sent = new ArrayList<>();
+            capturePackets(owner, sent);
+            helper.assertTrue(owner.interactOn(dragon, InteractionHand.OFF_HAND).consumesAction(), "The sketchbook should open");
+            var open = sent.stream().filter(ClientboundCustomPayloadPacket.class::isInstance).map(ClientboundCustomPayloadPacket.class::cast)
+                .map(ClientboundCustomPayloadPacket::payload).filter(EditorPayloads.SketchbookPage.class::isInstance)
+                .map(EditorPayloads.SketchbookPage.class::cast).findFirst().orElseThrow();
+            for (VariantRow row : open.rows()) {
+                for (int need : row.bondNeeded()) helper.assertTrue(need == 0, "With the lock off, nothing is locked at bond 0");
+            }
+            VariantRow row = open.rows()[lockedRow];
+            var choice = new EditorPayloads.SketchbookChoice(open.token(), row.locus(), row.slot(), ResourceLocation.parse(row.ids()[lockedOption]));
+            helper.assertTrue(SketchbookSessions.change(owner, choice) != null, "With the lock off, the server accepts a rarer look at bond 0");
+            helper.assertTrue(dragon.getBond(owner.getUUID()) == 0, "Editing must not change the bond");
+        } finally {
+            BodAddonConfig.SKETCHBOOK_REQUIRE_BOND.set(true);
         }
         helper.succeed();
     }

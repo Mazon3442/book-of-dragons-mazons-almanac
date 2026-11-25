@@ -48,9 +48,16 @@ public final class BodAddonConfig {
     public static final ModConfigSpec.DoubleValue STABLE_RADIUS;
     public static final ModConfigSpec.BooleanValue EEL_FEAR;
     public static final ModConfigSpec.IntValue CHEST_FEEDING_START;
+    public static final ModConfigSpec.BooleanValue SKETCHBOOK_REQUIRE_BOND;
     private static final ModConfigSpec.IntValue[] SKETCHBOOK_BOND = new ModConfigSpec.IntValue[3];
-    /** Bond (0 to 100) the Sketchbook asks for a rarity: 0 COMMON, 1 UNCOMMON, 2 RARE, 3 VERY_RARE. */
-    public static int sketchbookBond(int rarity) { return rarity <= 0 ? 0 : SKETCHBOOK_BOND[Math.min(rarity, 3) - 1].get(); }
+    /**
+     * Bond (0 to 100) the Sketchbook asks for a rarity: 0 COMMON, 1 UNCOMMON, 2 RARE, 3 VERY_RARE. Always 0 when the bond lock is
+     * turned off. The server computes every lock from this, so the book's padlocks, choosing a look and Paste all follow it.
+     */
+    public static int sketchbookBond(int rarity) {
+        if (rarity <= 0 || !SKETCHBOOK_REQUIRE_BOND.get()) return 0;
+        return SKETCHBOOK_BOND[Math.min(rarity, 3) - 1].get();
+    }
 
     private static final Map<DragonType, Map<PrimaryAttribute, ModConfigSpec.EnumValue<Rating>>> RATINGS = new EnumMap<>(DragonType.class);
 
@@ -65,6 +72,9 @@ public final class BodAddonConfig {
             .translation(KEY + "dragon_feeding.start").defineInRange("start_eating_at", 70, 0, 99);
         b.pop();
         b.translation(KEY + "sketchbook").push("sketchbook");
+        SKETCHBOOK_REQUIRE_BOND = b.comment("Whether the Sketchbook locks rarer colors and markings behind bond. Turn off to let owners pick any look",
+                "for their dragon straight away, whatever its bond. The bond levels below only apply while this is on.")
+            .translation(KEY + "sketchbook.require_bond").define("require_bond", true);
         String[] tiers = {"uncommon", "rare", "very_rare"};
         int[] defaults = {25, 50, 90};
         for (int i = 0; i < tiers.length; i++) {

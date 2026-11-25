@@ -89,7 +89,7 @@ Dragon Root is a plant that grows in four stages. Once it is fully grown it driv
 
 ## Sketchbook
 
-Right-click your own tamed dragon with the sketchbook. Opening it consumes one book in survival. You can make as many color and marking changes as you like during that session, and the more your dragon trusts you, the more of its colors and markings it offers. Common ones are always there; uncommon, rare and very rare ones unlock at bond 25, 50 and 90 (out of 100, set in the config). Locked options show the bond they need. Click a row to open the scrollable palette and zoom the live dragon toward the area you're editing. Drag the dragon to turn it, or scroll over it to zoom.
+Right-click your own tamed dragon with the sketchbook. Opening it consumes one book in survival. You can make as many color and marking changes as you like during that session, and the more your dragon trusts you, the more of its colors and markings it offers. Common ones are always there; uncommon, rare and very rare ones unlock at bond 25, 50 and 90 (out of 100, set in the config). Locked options show the bond they need. To skip the bond entirely, turn off `require_bond` in the config and every look is open straight away. Click a row to open the scrollable palette and zoom the live dragon toward the area you're editing. Drag the dragon to turn it, or scroll over it to zoom.
 
 The page also shows the dragon's bond and what it needs for the next unlock, for example "Bond 42 / 50 for rare". **Undo** puts the dragon back to how it looked when you opened the book. **Save** gives you a Sketchbook Page with the dragon's current look, and **Paste** applies a page you're carrying to a dragon of the same kind. Looks the dragon hasn't earned the bond for are skipped, and the page isn't used up.
 
@@ -133,7 +133,7 @@ If you also have [Spatial GUI](https://www.curseforge.com/minecraft/mc-mods/spat
 <details>
 <summary>Config options</summary>
 
-You can change how far feeding troughs and stable plates reach, the food level at which a dragon starts eating from its chest, and the bond the Sketchbook asks for each rarity. Every species also has editable letter grades for its stats.
+You can change how far feeding troughs and stable plates reach, the food level at which a dragon starts eating from its chest, and the bond the Sketchbook asks for each rarity, or turn the Sketchbook's bond lock off altogether. Every species also has editable letter grades for its stats.
 
 </details>
 
