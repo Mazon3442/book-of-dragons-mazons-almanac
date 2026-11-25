@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
+import net.magister.bookofdragons.entity.base.dragon.DragonBase;
+import net.magister.liberanimalium.roost.RoostBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -67,14 +69,18 @@ public final class PlateData extends SavedData {
     }
 
     /**
-     * Whether the point is within {@code radius} blocks of a roost that has a Stable Sign within the same distance of it.
-     * (A sign placed farther away than that is refused when you place it, but the config radius may have shrunk since.)
+     * Whether the dragon is one of the occupants of a roost that has a Stable Sign, and is within {@code radius} blocks of it.
+     * Occupancy is the engine's own roost ledger, so only dragons that have been assigned to the roost are held, not every
+     * tamed dragon that happens to wander past.
      */
-    public boolean nearActiveRoost(Vec3 point, double radius) {
+    public boolean holds(ServerLevel level, DragonBase dragon, double radius) {
         double limit = radius * radius;
         for (var e : signs.long2LongEntrySet()) {
-            Vec3 roost = BlockPos.of(e.getLongValue()).getCenter();
-            if (roost.distanceToSqr(point) <= limit && BlockPos.of(e.getLongKey()).getCenter().distanceToSqr(roost) <= limit) return true;
+            BlockPos roostPos = BlockPos.of(e.getLongValue());
+            Vec3 roost = roostPos.getCenter();
+            if (roost.distanceToSqr(dragon.position()) > limit || BlockPos.of(e.getLongKey()).getCenter().distanceToSqr(roost) > limit) continue;
+            if (level.isLoaded(roostPos) && level.getBlockEntity(roostPos) instanceof RoostBlockEntity roostEntity
+                && roostEntity.root().holds(dragon.getUUID())) return true;
         }
         return false;
     }

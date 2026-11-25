@@ -109,6 +109,8 @@ public final class SagefruitGameTests {
         helper.assertTrue(use(fruit, player, a) == InteractionResult.FAIL && !DragonFriendships.isFriend(a, b.getUUID()),
             "Other owners' dragons must not be fed");
         a.adopt(player.getUUID());
+        helper.assertTrue(use(fruit, player, a) == InteractionResult.FAIL, "A tamed dragon must not befriend a wild one");
+        b.adopt(player.getUUID());
         player.getAbilities().instabuild = true;
         helper.assertTrue(use(fruit, player, a).consumesAction() && fruit.getCount() == 2, "Creative owners must keep the fruit");
         var cow = helper.spawnWithNoFreeWill(EntityType.COW, 5, 2, 2);
@@ -131,6 +133,40 @@ public final class SagefruitGameTests {
             "New friendships must retain existing ones");
         helper.assertTrue(a.getPersistentData().getList("bodaddon_friends", 11).size() == 2, "Repeated use must not duplicate UUIDs");
         helper.succeed();
+    }
+
+    /**
+     * Regression: a tamed dragon held as pack with a wild one turned hostile to its owner when the owner fought that wild dragon,
+     * because the engine defends pack mates against anyone, owner included.
+     */
+    @GameTest(template = "sage_empty")
+    public static void friendshipsNeverCrossOwnersAndOldOnesAreReleased(GameTestHelper helper) {
+        DragonBase tame = dragon(helper, 2);
+        DragonBase wild = dragon(helper, 4);
+        DragonBase otherOwners = dragon(helper, 6);
+        UUID owner = UUID.randomUUID();
+        tame.adopt(owner);
+        otherOwners.adopt(UUID.randomUUID());
+        helper.assertTrue(!DragonFriendships.befriend(tame, wild) && !DragonFriendships.befriend(tame, otherOwners),
+            "A tamed dragon must not befriend a wild one or another player's dragon");
+        helper.assertTrue(!DragonFriendships.isFriend(tame, wild.getUUID()) && !DragonFriendships.isFriend(wild, tame.getUUID()),
+            "A refused friendship must not be stored");
+
+        // A friendship saved by an older version, between two dragons where one has since been tamed.
+        DragonBase laterTamed = dragon(helper, 8);
+        helper.assertTrue(DragonFriendships.befriend(laterTamed, wild), "Two wild dragons can be friends");
+        var social = laterTamed.faunaMind().knowledge().social();
+        helper.assertTrue(social.band(wild.getUUID()) != null, "The friendship holds a pack band");
+        laterTamed.adopt(owner);
+        helper.succeedWhen(() -> {
+            helper.assertTrue(!DragonFriendships.isFriend(laterTamed, wild.getUUID()) && !DragonFriendships.isFriend(wild, laterTamed.getUUID()),
+                "A friendship that now crosses owners must be dropped on both sides");
+            helper.assertTrue(social.band(wild.getUUID()) == null, "The forced pack band must be released");
+            helper.assertTrue(social.of(wild.getUUID()).like() <= 0.0F, "The forced liking must be taken back");
+            float health = wild.getHealth();
+            wild.hurt(helper.getLevel().damageSources().mobAttack(laterTamed), 1.0F);
+            helper.assertTrue(wild.getHealth() < health, "Released dragons are no longer shielded from each other");
+        });
     }
 
     private static DragonBase dragon(GameTestHelper helper, int x) {

@@ -9,6 +9,9 @@ import local.bodaddon.trough.FeedingTroughBlock;
 import local.bodaddon.trough.FeedingTroughBlockEntity;
 import net.magister.bookofdragons.entity.ModEntities;
 import net.magister.bookofdragons.entity.base.dragon.DragonBase;
+import net.magister.liberanimalium.chassis.component.CommandComponent;
+import net.magister.liberanimalium.chassis.component.command.Stance;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
@@ -81,9 +84,16 @@ public final class StatusGameTests {
                 "A linked stable with no dragons around says so");
 
             DragonBase dragon = helper.spawnWithNoFreeWill(ModEntities.TERRIBLE_TERROR.get(), 4, 2, 4);
-            dragon.adopt(UUID.randomUUID());
+            UUID owner = UUID.randomUUID();
+            dragon.adopt(owner);
+            helper.assertTrue(keys(StableEvents.status(level, sign, "Home")).contains("bodaddon.stable.status.none"),
+                "A tamed dragon that is not assigned to the roost is not held");
+            var roostEntity = (net.magister.liberanimalium.roost.RoostBlockEntity) level.getBlockEntity(roost);
+            roostEntity.setPlacedBy(owner);
+            String refusal = roostEntity.assign(dragon);
+            helper.assertTrue(refusal == null, "The dragon is assigned to the roost: " + refusal);
             helper.assertTrue(keys(StableEvents.status(level, sign, "Home")).contains("bodaddon.stable.status.dragon.held"),
-                "A tamed dragon near the roost is held");
+                "A tamed dragon assigned to the roost is held");
             dragon.getPersistentData().putLong("bodaddon_stable_hurt", level.getGameTime());
             helper.assertTrue(keys(StableEvents.status(level, sign, "Home")).contains("bodaddon.stable.status.dragon.hurt"),
                 "A recently hurt dragon is reported as free to move");
@@ -95,5 +105,59 @@ public final class StatusGameTests {
             plates.removeSign(sign);
         }
         helper.succeed();
+    }
+
+    /**
+     * Regression: the Stable Plate used to pin every tamed dragon near the roost to full obedience, whatever its order, so they
+     * ignored calls and never slept or ate. It must hold only a dragon assigned to the roost under a stay order, ease off when it
+     * is tired, and hand control back as soon as it is told to follow.
+     */
+    @GameTest(template = "empty")
+    public static void stablePlateHoldsOnlyStayingRoostDragonsAndLetsThemRest(GameTestHelper helper) {
+        var level = helper.getLevel();
+        BlockPos sign = helper.absolutePos(new BlockPos(4, 2, 4));
+        BlockPos roost = sign.offset(3, 0, 0);
+        var plates = PlateData.get(level);
+        try {
+            level.setBlock(roost, BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath("bookofdragons", "roost_controller"))
+                .defaultBlockState(), 3);
+            plates.put(sign, roost);
+            DragonBase dragon = helper.spawnWithNoFreeWill(ModEntities.TERRIBLE_TERROR.get(), 4, 2, 4);
+            UUID owner = UUID.randomUUID();
+            dragon.adopt(owner);
+            var command = dragon.componentRegistry.get(CommandComponent.class);
+            var obedience = dragon.faunaMind().knowledge().obedience();
+
+            command.setCommandForced(Stance.STAY, Stance.STAY.defaultModifier());
+            holdCheck(dragon);
+            helper.assertTrue(!dragon.getPersistentData().getBoolean("bodaddon_stable_held"),
+                "A staying dragon that is not assigned to the roost is not held");
+
+            var roostEntity = (net.magister.liberanimalium.roost.RoostBlockEntity) level.getBlockEntity(roost);
+            roostEntity.setPlacedBy(owner);
+            helper.assertTrue(roostEntity.assign(dragon) == null, "The dragon is assigned to the roost");
+            holdCheck(dragon);
+            helper.assertTrue(obedience.compliance() == 1.0F, "An assigned dragon under a stay order is held");
+
+            dragon.faunaMind().reservoirs().fatigueTo(0.5F);
+            holdCheck(dragon);
+            helper.assertTrue(obedience.compliance() < 1.0F && dragon.getPersistentData().getBoolean("bodaddon_stable_resting"),
+                "A tired held dragon is eased so it can go to sleep");
+
+            command.setCommandForced(Stance.FOLLOW, Stance.FOLLOW.defaultModifier());
+            holdCheck(dragon);
+            helper.assertTrue(!dragon.getPersistentData().contains("bodaddon_stable_held") && obedience.compliance() != 1.0F,
+                "A dragon told to follow is let go at once");
+        } finally {
+            plates.removeSign(sign);
+        }
+        helper.succeed();
+    }
+
+    /** Runs the Stable Plate's periodic check on this dragon now. */
+    private static void holdCheck(DragonBase dragon) {
+        dragon.tickCount += Math.floorMod(-(dragon.tickCount + dragon.getId()), 20);
+        StableEvents.onTick(new EntityTickEvent.Post(dragon));
+        dragon.tickCount += 20;
     }
 }

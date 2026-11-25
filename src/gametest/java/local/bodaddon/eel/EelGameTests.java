@@ -97,6 +97,39 @@ public final class EelGameTests {
         helper.succeed();
     }
 
+    /**
+     * Regression: eels used to send tamed dragons running too. The forced route outranks the owner's orders for over a minute,
+     * so a player holding an eel left their own dragons ignoring them, stuck and unable to sleep.
+     */
+    @GameTest(template = "sage_empty")
+    public static void eelsDriveOffOnlyWildDragons(GameTestHelper helper) {
+        var tame = helper.spawn(net.magister.bookofdragons.entity.ModEntities.TERRIBLE_TERROR.get(), 40, 2, 40);
+        var wild = helper.spawn(net.magister.bookofdragons.entity.ModEntities.TERRIBLE_TERROR.get(), 50, 2, 40);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        tame.adopt(player.getUUID());
+        helper.assertTrue(!EelDread.drivenOff(tame) && EelDread.drivenOff(wild), "Only a wild dragon may be driven off by eels");
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.COOKED_EEL.get()));
+        for (var dragon : java.util.List.of(tame, wild)) {
+            player.moveTo(dragon.getX() + 2, dragon.getY(), dragon.getZ());
+            var event = new net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteract(player, InteractionHand.MAIN_HAND, dragon);
+            EelDread.onOffered(event);
+            helper.assertTrue(event.isCanceled(), "Every dragon refuses an offered eel");
+        }
+        helper.assertTrue(forcedDestination(tame) == null, "An owner offering an eel must not send their tamed dragon running");
+        helper.assertTrue(forcedDestination(wild) != null, "A wild dragon offered an eel still runs from it");
+        helper.succeed();
+    }
+
+    private static Object forcedDestination(net.magister.bookofdragons.entity.base.dragon.DragonBase dragon) {
+        try {
+            var field = net.magister.liberanimalium.fauna.core.FaunaMind.class.getDeclaredField("forcedDestination");
+            field.setAccessible(true);
+            return field.get(dragon.faunaMind());
+        } catch (ReflectiveOperationException ex) {
+            throw new IllegalStateException(ex);
+        }
+    }
+
     @GameTest(template = "sage_empty")
     public static void scentAndBlockRepelOnlyWildDragonsInTheirRadius(GameTestHelper helper) {
         var level = helper.getLevel();

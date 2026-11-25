@@ -2,6 +2,20 @@
 
 All notable changes to Book of Dragons: Mazon's Almanac. Newest first.
 
+## 0.4.1
+
+A fix release for tamed dragons that ignored their owner, stood around, got exhausted or turned hostile. Update as soon as you can. Dragons that were affected recover on their own once they have slept and eaten.
+
+### Fixed
+- **Stable Plate:** it now holds only the dragons assigned to that roost, and only while they are under a stay order. Before, it pinned every tamed dragon near the roost, so they ignored calls and follow orders and went tired and hungry.
+- **Stable Plate:** a held dragon is let go to sleep or eat when either need reaches 35%, instead of waiting until tiredness hit 50%.
+- **Eels:** tamed dragons no longer run from eels at all. They still sniff and hiss at eel items and refuse to eat them. Before, a live eel in a river, or you holding an Eel, Cooked Eel or a bucket of eel, sent your dragons running for up to a minute. During that time they ignored your calls and orders, could get stuck trying to reach a spot they couldn't get to, and didn't sleep. Wild dragons still run, but not while ridden or stuck.
+- **Sagefruit:** a dragon now only befriends dragons with the same owner, or other wild dragons if it is wild. Before, it could make your tamed dragon permanent pack mates with a wild dragon. When you then fought that wild dragon, your own dragons sided with it and turned hostile to you. Friendships like that from older versions are undone automatically, and your dragons go back to judging that dragon normally.
+- **Feeding Trough:** it no longer walks a dragon you are riding, or one under a stay order, over to the food. It feeds them where they are instead.
+
+### New
+- **Config:** "Dragons fear eels" turns the eel fear off.
+
 ## 0.4.0
 
 ### New

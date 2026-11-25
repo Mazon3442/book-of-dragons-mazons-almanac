@@ -46,6 +46,7 @@ public final class BodAddonConfig {
     public static final ModConfigSpec SPEC;
     public static final ModConfigSpec.DoubleValue TROUGH_RADIUS;
     public static final ModConfigSpec.DoubleValue STABLE_RADIUS;
+    public static final ModConfigSpec.BooleanValue EEL_FEAR;
     public static final ModConfigSpec.IntValue CHEST_FEEDING_START;
     private static final ModConfigSpec.IntValue[] SKETCHBOOK_BOND = new ModConfigSpec.IntValue[3];
     /** Bond (0 to 100) the Sketchbook asks for a rarity: 0 COMMON, 1 UNCOMMON, 2 RARE, 3 VERY_RARE. */
@@ -73,8 +74,12 @@ public final class BodAddonConfig {
         }
         b.pop();
         b.translation(KEY + "stable_plate").push("stable_plate");
-        STABLE_RADIUS = b.comment("How far, in blocks, a Stable Plate on a Dragon Roost holds tamed dragons in their stay order.")
+        STABLE_RADIUS = b.comment("How far, in blocks, a Stable Plate on a Dragon Roost holds the dragons assigned to that roost in their stay order.")
             .translation(KEY + "stable_plate.radius").defineInRange("radius", 24.0, 4.0, 128.0);
+        b.pop();
+        b.translation(KEY + "eels").push("eels");
+        EEL_FEAR = b.comment("Wild dragons run from live eels and eel items. Tamed dragons only sniff and hiss at eel items and never run. Turn off to stop it.")
+            .translation(KEY + "eels.fear").define("dragons_fear_eels", true);
         b.pop();
         b.comment("Stat letter per dragon species. DEFAULT keeps Book of Dragons' own rating. S, A, B, C or D moves that stat's",
                 "range to that letter, so the Book shows the new letter and the dragon's real stat changes with it.")

@@ -3,6 +3,7 @@ package local.bodaddon.trough;
 import local.bodaddon.BodAddonConfig;
 import local.bodaddon.ModBlocks;
 import net.magister.bookofdragons.entity.base.dragon.DragonBase;
+import net.magister.liberanimalium.fauna.api.Order;
 import net.magister.liberanimalium.chassis.component.simulation.FaunaNeedsSystem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -106,7 +107,7 @@ public class FeedingTroughBlockEntity extends BaseContainerBlockEntity {
         DragonBase eater = null;
         for (DragonBase dragon : server.getEntitiesOfClass(DragonBase.class, area(state))) {
             if (dragon.isEating()) return;   // somebody is mid-meal: leave it be
-            if (hungry(dragon) && (eater == null || dragon.distanceToSqr(item) < eater.distanceToSqr(item))) eater = dragon;
+            if (hungry(dragon) && mayWalk(dragon) && (eater == null || dragon.distanceToSqr(item) < eater.distanceToSqr(item))) eater = dragon;
         }
         if (eater != null) {
             double dx = eater.getX() - item.getX(), dz = eater.getZ() - item.getZ();
@@ -171,6 +172,14 @@ public class FeedingTroughBlockEntity extends BaseContainerBlockEntity {
             lines.add(Component.translatable("bodaddon.trough.status.more", dragons.size() - MAX_STATUS_DRAGONS));
         }
         return lines;
+    }
+
+    /**
+     * Whether the trough may walk this dragon over to the lure. Not one that is ridden or under a stay order: the trough must
+     * never pull a dragon away from its rider or its post. Those are fed in place once the lure runs out (see feedDirect).
+     */
+    private static boolean mayWalk(DragonBase dragon) {
+        return !dragon.isVehicle() && dragon.order() != Order.STAY;
     }
 
     private static boolean hungry(DragonBase dragon) {

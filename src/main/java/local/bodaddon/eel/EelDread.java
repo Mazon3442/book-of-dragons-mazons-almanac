@@ -1,6 +1,7 @@
 package local.bodaddon.eel;
 
 import java.util.List;
+import local.bodaddon.BodAddonConfig;
 import local.bodaddon.ModItems;
 import net.magister.bookofdragons.entity.base.dragon.DragonBase;
 import net.minecraft.core.BlockPos;
@@ -22,8 +23,11 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
 /**
- * Every dragon, wild or tamed, is scared of live eels and disgusted by eel items: a dragon that sees an eel, an eel item on
- * the ground or a player holding one backs away from it, and one that is offered an eel turns it down.
+ * Wild dragons are scared of live eels, and every dragon, wild or tamed, is disgusted by eel items: a dragon that sees an eel,
+ * an eel item on the ground or a player holding one sniffs and hisses at it, and one that is offered an eel turns it down. Only a
+ * wild dragon is driven away. A tamed dragon is never sent running: a forced route outranks its owner's orders for over a minute,
+ * so its owner holding a Cooked Eel, or an eel in a nearby river, would leave it ignoring calls, stuck at an unreachable spot and
+ * kept from sleeping. A tamed dragon also ignores live eels, and no dragon runs while it is ridden or already stuck.
  */
 public final class EelDread {
     private static final int PERIOD = 10;
@@ -36,8 +40,8 @@ public final class EelDread {
         return stack.is(ModItems.EEL.get()) || stack.is(ModItems.COOKED_EEL.get()) || stack.is(ModItems.EEL_BUCKET.get());
     }
 
-    private static boolean frightens(Entity e) {
-        if (e instanceof EelEntity eel) return eel.isAlive();
+    private static boolean frightens(DragonBase dragon, Entity e) {
+        if (e instanceof EelEntity eel) return !dragon.isTame() && eel.isAlive();
         if (e instanceof ItemEntity item) return isEelItem(item.getItem());
         return e instanceof Player player && (isEelItem(player.getMainHandItem()) || isEelItem(player.getOffhandItem()));
     }
@@ -45,12 +49,12 @@ public final class EelDread {
     @SubscribeEvent
     public static void onTick(EntityTickEvent.Post event) {
         if (!(event.getEntity() instanceof DragonBase dragon) || !(dragon.level() instanceof ServerLevel level)) return;
-        if (!dragon.isAlive() || (dragon.tickCount + dragon.getId()) % PERIOD != 0 || dragon.faunaMind() == null) return;
+        if (!BodAddonConfig.EEL_FEAR.get() || !dragon.isAlive() || (dragon.tickCount + dragon.getId()) % PERIOD != 0 || dragon.faunaMind() == null) return;
         List<Entity> threats = level.getEntities(dragon, AABB.ofSize(dragon.position(), SIGHT * 2, SIGHT * 2, SIGHT * 2),
-            e -> frightens(e) && e.distanceToSqr(dragon) <= SIGHT * SIGHT);
+            e -> frightens(dragon, e) && e.distanceToSqr(dragon) <= SIGHT * SIGHT);
         if (threats.isEmpty()) return;
         Entity nearest = threats.stream().min((a, b) -> Double.compare(a.distanceToSqr(dragon), b.distanceToSqr(dragon))).get();
-        if (dragon.getTarget() != null && frightens(dragon.getTarget())) dragon.setTarget(null);
+        if (dragon.getTarget() != null && frightens(dragon, dragon.getTarget())) dragon.setTarget(null);
         if ((dragon.tickCount / PERIOD) % REACT_EVERY == 0) disgust(level, dragon);
         flee(level, dragon, nearest.position());
     }
@@ -73,16 +77,23 @@ public final class EelDread {
         level.playSound(null, dragon.blockPosition(), SoundEvents.CAT_HISS, SoundSource.NEUTRAL, 0.7F, 0.7F);
     }
 
-    /** Sends the dragon a hop away from the source, unless it is already on a route. */
+    /** Whether eels may send this dragon running: only a wild one, never a tamed one, which must stay under its owner's orders. */
+    static boolean drivenOff(DragonBase dragon) {
+        return !dragon.isTame();
+    }
+
+    /** Sends a wild dragon a hop away from the source, unless it is already on a route. */
     private static void flee(ServerLevel level, DragonBase dragon, Vec3 from) {
-        var route = dragon.faunaMind().route();
-        if (route.hasRoute() || route.solving()) return;
+        if (!drivenOff(dragon)) return;
+        var mind = dragon.faunaMind();
+        var route = mind.route();
+        if (route.hasRoute() || route.solving() || mind.cornered() || dragon.isVehicle()) return;
         Vec3 away = new Vec3(dragon.getX() - from.x, 0, dragon.getZ() - from.z);
         away = away.lengthSqr() < 1.0E-4 ? new Vec3(1, 0, 0) : away.normalize();
         BlockPos exit = BlockPos.containing(dragon.getX() + away.x * HOP, dragon.getY(), dragon.getZ() + away.z * HOP);
         if (!level.hasChunkAt(exit)) return;
         if (!dragon.isFlying()) exit = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, exit);
-        dragon.faunaMind().forceRoute(exit);
+        mind.forceRoute(exit);
     }
 
     private EelDread() {}

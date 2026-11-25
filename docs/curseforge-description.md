@@ -30,13 +30,13 @@
 | | Item | What it does |
 |---|---|---|
 | <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/dragon_nip.png" width="48"> | **Dragon Nip** | Calms a wild dragon for five minutes so it's easier to tame. Grow more with Dragon Nip Grass. |
-| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/sagefruit.png" width="48"> | **Sagefruit** | Makes a dragon befriend every dragon within 32 blocks. Grows on sage trees. |
+| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/sagefruit.png" width="48"> | **Sagefruit** | Makes a dragon befriend the dragons within 32 blocks that share its owner, or the other wild ones if it is wild. Grows on sage trees. |
 | <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/dragon_treat.png" width="48"> | **Dragon Treat** | Builds loyalty with a dragon you've already tamed. |
 | <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/dragon_poultice.png" width="48"> | **Dragon Poultice** | Shortens an injured dragon's recovery time. |
 | <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/feeding_trough.png" width="48"> | **Feeding Trough** | Hungry dragons nearby walk over and eat on their own. |
-| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/stable_plate.png" width="48"> | **Stable Plate and Sign** | Link a plate to a Dragon Roost and name your stable. Tamed dragons near the roost stay put. |
+| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/stable_plate.png" width="48"> | **Stable Plate and Sign** | Link a plate to a Dragon Roost and name your stable. Dragons that live at the roost keep their stay order. |
 | <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/dragon_repellent.png" width="48"> | **Dragon Repellent** | Drink it for 8 minutes of Dragon Scent and wild dragons keep their distance. Also a placeable block. |
-| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/eel.png" width="48"> | **Eel** | A new catch when you fish in rivers and swamps. Dragons are scared of live eels and disgusted by the item. |
+| <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/eel.png" width="48"> | **Eel** | A new catch when you fish in rivers and swamps. Wild dragons are scared of eels. Tamed ones are only disgusted by the item. |
 | <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/cooked_eel.png" width="48"> | **Cooked Eel** | Cook an Eel in a furnace, smoker, or campfire. Restores as much hunger as cooked cod. |
 | <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/dragon_root_seeds.png" width="48"> | **Dragon Root Seeds** | Plant them in dirt or farmland and grow your own Dragon Root. |
 | <img src="https://raw.githubusercontent.com/Mazon3442/book-of-dragons-mazons-almanac/main/docs/images/items/dragon_editor.png" width="48"> | **Dragon Editor** | Creative only. Opens the editor below. |
@@ -76,13 +76,13 @@ Dragon Root is a plant that grows in four stages. Once it is fully grown it driv
 ### Setting things up
 
 - **Feeding Trough:** place it and dragons within 16 blocks come to eat. You can change the range in the config.
-- **Stable Plate:** right-click a Dragon Roost with it to link them, then place it like a sign within 24 blocks of the roost. Tamed dragons in that area keep their stay order. You can change the range in the config.
+- **Stable Plate:** right-click a Dragon Roost with it to link them, then place it like a sign within 24 blocks of the roost. Dragons assigned to that roost keep their stay order when they are told to stay, and still rest and eat when they need to. You can change the range in the config.
 - **Status:** sneak and right-click a Feeding Trough or a Stable Sign with an empty hand to see who is in reach, who is hungry, how full the trough is, and how the stable is holding its dragons. A normal right-click still opens the chest or the name box.
 - **Dragon Treat and Dragon Poultice:** use them on your own tamed dragon. The poultice takes 60 seconds to work and then cuts an hour off the injury.
 - **Dragon Root Seeds:** plant them on dirt, grass, or farmland in light level 9 or more. The plant grows through four stages and only the last one repels dragons. It grows about two and a half times faster on farmland than on plain dirt, and Bone Meal moves it up a stage.
 - **Chest feeding:** a tamed dragon with a chest starts eating from it when its food drops to 70 out of 100, and keeps eating until it is full or the chest has nothing it will eat. You can change the start level in the config.
-- **Eels and dragons:** every dragon, wild or tamed, backs away from live eels, eel items and buckets of eel, and refuses one if you offer it.
-- **Dragon Nip and Sagefruit:** feed them to a wild dragon or one of your own. Nip calms it for five minutes. Sagefruit makes it befriend every dragon within 32 blocks.
+- **Eels and dragons:** wild dragons run from live eels, eel items and buckets of eel. Tamed dragons sniff and hiss at eel items but never run, so they keep following your orders. Every dragon refuses an eel if you offer it.
+- **Dragon Nip and Sagefruit:** feed them to a wild dragon or one of your own. Nip calms it for five minutes. Sagefruit makes it befriend the dragons within 32 blocks that share its owner (a wild one befriends other wild ones), so your dragons never side with a wild dragon against you.
 
 ## Sketchbook
 

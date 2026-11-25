@@ -332,6 +332,63 @@ public final class SketchbookGameTests {
         helper.succeed();
     }
 
+    /**
+     * Reports said the Sketchbook drops loyalty and turns dragons against their owners. Everything the book can do
+     * (open, change, undo, save, paste, close) and some ticks afterward must leave the owner's opinion untouched.
+     */
+    @GameTest(template = "empty", timeoutTicks = 200)
+    public static void sketchbookNeverChangesTheOwnersBondOrOpinion(GameTestHelper helper) {
+        DragonBase dragon = dragon(helper);
+        DragonBase other = dragon(helper);
+        ServerPlayer owner = player(helper, dragon);
+        capturePackets(owner, new ArrayList<>());
+        dragon.adopt(owner.getUUID());
+        other.adopt(owner.getUUID());
+        DragonEdits.setBond(dragon, owner.getUUID(), 450);
+        DragonEdits.setBond(other, owner.getUUID(), 450);
+        String before = opinion(dragon, owner);
+        String otherBefore = opinion(other, owner);
+
+        holdBook(owner);
+        var open = SketchbookSessions.open(owner, dragon, InteractionHand.OFF_HAND);
+        helper.assertTrue(opinion(dragon, owner).equals(before), "Opening the book changed the opinion: " + before + " -> " + opinion(dragon, owner));
+        for (VariantRow row : open.rows()) {
+            for (int i = 0; i < row.options().length; i++) {
+                if (i == row.current() || row.bondNeeded()[i] > 0) continue;
+                SketchbookSessions.change(owner, new EditorPayloads.SketchbookChoice(open.token(), row.locus(), row.slot(), ResourceLocation.parse(row.ids()[i])));
+                break;
+            }
+        }
+        helper.assertTrue(opinion(dragon, owner).equals(before), "Changing looks changed the opinion: " + before + " -> " + opinion(dragon, owner));
+        SketchbookSessions.saveLook(owner, open.token());
+        int slot = -1;
+        for (int i = 0; i < owner.getInventory().getContainerSize(); i++) {
+            if (owner.getInventory().getItem(i).is(ModItems.SKETCHBOOK_PAGE.get())) slot = i;
+        }
+        SketchbookSessions.revert(owner, open.token());
+        SketchbookSessions.paste(owner, open.token(), slot);
+        helper.assertTrue(opinion(dragon, owner).equals(before), "Undo/Save/Paste changed the opinion: " + before + " -> " + opinion(dragon, owner));
+        SketchbookSessions.close(owner, open.token());
+
+        // Pasting this page onto a second dragon, and letting the world tick, must not move either dragon's opinion.
+        holdBook(owner);   // opening consumed the first book
+        var second = SketchbookSessions.open(owner, other, InteractionHand.OFF_HAND);
+        SketchbookSessions.paste(owner, second.token(), slot);
+        SketchbookSessions.close(owner, second.token());
+        helper.runAfterDelay(100, () -> {
+            helper.assertTrue(opinion(dragon, owner).equals(before), "Ticking after using the book changed the opinion: " + before + " -> " + opinion(dragon, owner));
+            helper.assertTrue(opinion(other, owner).equals(otherBefore), "The pasted-on dragon's opinion changed: " + otherBefore + " -> " + opinion(other, owner));
+            helper.assertTrue(dragon.isTame() && dragon.getTarget() == null, "The dragon must still be tame and not hunting anyone");
+            helper.succeed();
+        });
+    }
+
+    private static String opinion(DragonBase dragon, ServerPlayer owner) {
+        var o = dragon.faunaMind().knowledge().social().of(owner.getUUID());
+        return "bond=" + dragon.getBond(owner.getUUID()) + " like=" + o.like() + " fear=" + o.fear() + " anger=" + o.anger()
+            + " familiarity=" + o.familiarity();
+    }
+
     private static int pageCount(ServerPlayer player) {
         int n = 0;
         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {

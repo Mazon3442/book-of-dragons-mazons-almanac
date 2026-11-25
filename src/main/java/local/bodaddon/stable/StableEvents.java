@@ -5,7 +5,9 @@ import java.util.List;
 
 import local.bodaddon.BodAddonConfig;
 import net.magister.bookofdragons.entity.base.dragon.DragonBase;
+import net.magister.liberanimalium.fauna.api.Order;
 import net.magister.liberanimalium.fauna.core.FaunaMind;
+import net.magister.liberanimalium.fauna.reservoir.Reservoirs;
 import net.magister.liberanimalium.roost.RoostBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -20,14 +22,15 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 /**
  * What the Stable Plate does. The engine lets a dragon refuse or drift away from a stay order according to its
  * compliance (a 0-1 value from bond and temper). While a tamed dragon is within range of a plated roost that value is pinned
- * to 1, so it obeys and keeps its order. A roost counts once a Stable Sign linked to it stands within range. Once it is hurt the pin is lifted for a while, so it can fight or flee as it
+ * to 1, so it obeys and keeps its order. That applies only to a dragon assigned to a roost (one of its occupants) that is under a stay
+ * order. A roost counts once a Stable Sign linked to it stands within range. Once it is hurt the pin is lifted for a while, so it can fight or flee as it
  * normally would, then settles back.
  */
 public final class StableEvents {
     private static final String HURT_KEY = "bodaddon_stable_hurt";
     private static final String HELD_KEY = "bodaddon_stable_held";
     private static final String RESTING_KEY = "bodaddon_stable_resting";
-    private static final float REST_NEEDED = 0.5F;       // sleep need (0 to 1) at which a held dragon is let go to sleep
+    private static final float REST_NEEDED = 0.35F;      // sleep or food need (0 to 1) at which a held dragon is let go to sleep or eat
     private static final float REST_DONE = 0.1F;         // and the need it must fall to before the hold is pinned tight again
     private static final float RESTING_COMPLIANCE = 0.4F;
     private static final int CHECK_PERIOD = 20;
@@ -41,12 +44,14 @@ public final class StableEvents {
         if (mind == null) return;
         CompoundTag data = dragon.getPersistentData();
         boolean recentlyHurt = level.getGameTime() - data.getLong(HURT_KEY) <= HURT_WINDOW && data.contains(HURT_KEY);
-        boolean hold = dragon.isTame() && !recentlyHurt
-            && PlateData.get(level).nearActiveRoost(dragon.position(), BodAddonConfig.STABLE_RADIUS.get());
+        // Only a tamed dragon that lives at the roost and is under a stay order is held: one that has been called or told to
+        // follow or roam is the owner's to command, whatever is nearby.
+        boolean hold = dragon.isTame() && !recentlyHurt && dragon.order() == Order.STAY
+            && PlateData.get(level).holds(level, dragon, BodAddonConfig.STABLE_RADIUS.get());
         if (hold) {
-            // A held dragon still sleeps when it needs to: with the pin at full the stay outbids all but extreme tiredness, so
-            // ease it while the sleep need is high (and keep it eased until the dragon has slept and is rested again).
-            float debt = mind.reservoirs().fatigue();
+            // A held dragon still sleeps and eats when it needs to: with the pin at full the stay outbids all but extreme need, so
+            // ease it while the sleep or food need is high (and keep it eased until the dragon is rested and fed again).
+            float debt = Math.max(mind.reservoirs().fatigue(), mind.reservoirs().level(Reservoirs.HUNGER));
             boolean resting = data.getBoolean(RESTING_KEY) ? debt > REST_DONE || dragon.asleep() : debt >= REST_NEEDED;
             data.putBoolean(RESTING_KEY, resting);
             mind.forceComply(resting ? RESTING_COMPLIANCE : 1.0F);
@@ -79,9 +84,10 @@ public final class StableEvents {
             lines.add(Component.translatable("bodaddon.stable.status.far"));
             return lines;
         }
+        PlateData plates = PlateData.get(level);
         int listed = 0;
         for (DragonBase dragon : level.getEntitiesOfClass(DragonBase.class, new AABB(roost).inflate(radius))) {
-            if (!dragon.isTame() || dragon.position().distanceToSqr(roost.getCenter()) > radius * radius) continue;
+            if (!dragon.isTame() || !plates.holds(level, dragon, radius)) continue;
             CompoundTag data = dragon.getPersistentData();
             boolean hurt = data.contains(HURT_KEY) && level.getGameTime() - data.getLong(HURT_KEY) <= HURT_WINDOW;
             String key = hurt ? "hurt" : data.getBoolean(RESTING_KEY) ? "resting" : "held";
