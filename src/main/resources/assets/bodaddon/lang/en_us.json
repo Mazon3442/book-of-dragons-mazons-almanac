@@ -110,7 +110,7 @@
   "bodaddon.stable.status.none": "No tamed dragons within %s blocks of the roost.",
   "bodaddon.stable.status.dragon.held": "%s: staying put.",
   "bodaddon.stable.status.dragon.hurt": "%s: hurt, free to move for now.",
-  "bodaddon.stable.status.dragon.resting": "%s: resting.",
+  "bodaddon.stable.status.dragon.resting": "%s: let go to eat or sleep.",
   "bodaddon.trough.status.store": "Trough: %s of %s slots used, %s items.",
   "bodaddon.trough.status.none": "No dragons within %s blocks.",
   "bodaddon.trough.status.dragons": "%s dragons in reach:",

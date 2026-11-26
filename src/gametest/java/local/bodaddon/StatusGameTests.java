@@ -109,8 +109,8 @@ public final class StatusGameTests {
 
     /**
      * Regression: the Stable Plate used to pin every tamed dragon near the roost to full obedience, whatever its order, so they
-     * ignored calls and never slept or ate. It must hold only a dragon assigned to the roost under a stay order, ease off when it
-     * is tired, and hand control back as soon as it is told to follow.
+     * ignored calls and never slept or ate. It must hold only a dragon assigned to the roost under a stay order, let go of it
+     * completely when it is hungry or tired, and hand control back as soon as it is told to follow.
      */
     @GameTest(template = "empty")
     public static void stablePlateHoldsOnlyStayingRoostDragonsAndLetsThemRest(GameTestHelper helper) {
@@ -127,6 +127,8 @@ public final class StatusGameTests {
             dragon.adopt(owner);
             var command = dragon.componentRegistry.get(CommandComponent.class);
             var obedience = dragon.faunaMind().knowledge().obedience();
+            var needs = dragon.getNeedsSystem();
+            needs.setFoodLevel(100);
 
             command.setCommandForced(Stance.STAY, Stance.STAY.defaultModifier());
             holdCheck(dragon);
@@ -139,10 +141,25 @@ public final class StatusGameTests {
             holdCheck(dragon);
             helper.assertTrue(obedience.compliance() == 1.0F, "An assigned dragon under a stay order is held");
 
-            dragon.faunaMind().reservoirs().fatigueTo(0.5F);
+            // Regression: the pin blocks eating and halves sleep under a stay order, and a hungry dragon sees people as prey from
+            // 0.3 hunger. The hold must let go completely, back to the engine, before that.
+            needs.setFoodLevel((int) (100 * (1 - StableEvents.HUNGER_LET_GO)) - 2);
             holdCheck(dragon);
-            helper.assertTrue(obedience.compliance() < 1.0F && dragon.getPersistentData().getBoolean("bodaddon_stable_resting"),
-                "A tired held dragon is eased so it can go to sleep");
+            helper.assertTrue(released(obedience) && dragon.getPersistentData().getBoolean("bodaddon_stable_resting"),
+                "A dragon getting hungry is let go completely, so it can eat");
+            helper.assertTrue(dragon.hungerLevel() < 0.3F, "It is let go before even the most aggressive dragon's prey line");
+            needs.setFoodLevel(85);
+            holdCheck(dragon);
+            helper.assertTrue(released(obedience), "It stays free until it has eaten its fill, not the moment it dips under the line");
+            needs.setFoodLevel(100);
+            holdCheck(dragon);
+            helper.assertTrue(obedience.compliance() == 1.0F && !dragon.getPersistentData().contains("bodaddon_stable_resting"),
+                "A fed, rested dragon is held again");
+
+            dragon.faunaMind().reservoirs().fatigueTo(StableEvents.SLEEP_LET_GO);
+            holdCheck(dragon);
+            helper.assertTrue(released(obedience), "A tired dragon is let go completely, so it can sleep");
+            helper.assertTrue(StableEvents.SLEEP_LET_GO < 0.75F, "It is let go long before the Book would call it exhausted");
 
             command.setCommandForced(Stance.FOLLOW, Stance.FOLLOW.defaultModifier());
             holdCheck(dragon);
@@ -152,6 +169,17 @@ public final class StatusGameTests {
             plates.removeSign(sign);
         }
         helper.succeed();
+    }
+
+    /** Whether compliance has been handed back to the engine rather than pinned. */
+    private static boolean released(net.magister.liberanimalium.fauna.know.Obedience obedience) {
+        try {
+            var forced = net.magister.liberanimalium.fauna.know.Obedience.class.getDeclaredField("forced");
+            forced.setAccessible(true);
+            return Float.isNaN(forced.getFloat(obedience));
+        } catch (ReflectiveOperationException ex) {
+            throw new IllegalStateException(ex);
+        }
     }
 
     /** Runs the Stable Plate's periodic check on this dragon now. */

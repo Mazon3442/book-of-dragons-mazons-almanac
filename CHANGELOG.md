@@ -2,6 +2,14 @@
 
 All notable changes to Book of Dragons: Mazon's Almanac. Newest first.
 
+## 0.4.3
+
+A fix for dragons assigned to a roost with a Stable Plate that turned hostile to everyone and stopped eating and sleeping. Update as soon as you can. Affected dragons calm down once they have eaten and slept, and nothing needs resetting.
+
+### Fixed
+- **Stable Plate:** a held dragon is now let go completely as soon as it starts getting hungry (20%) or tired (30%), and held again only once it has eaten and slept. In 0.4.1 it was only loosened, and only at 35%. Under a stay order the plate's hold stops a dragon going to eat and halves its urge to sleep. A hungry dragon starts treating nearby players as prey from 30% hunger (the most aggressive species), so roost dragons went hungry, went short on sleep, and turned on everyone nearby, owner included. Now the hold always lets go well before that.
+- **Stable Sign status:** a dragon that has been let go now shows as "let go to eat or sleep".
+
 ## 0.4.2
 
 ### New
